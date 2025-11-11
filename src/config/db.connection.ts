@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {dburl} from "../config/system.variable";
+import {dburl} from "./system.variable";
 
 export const mongoConnection = async () => {
   try {
