@@ -2,6 +2,7 @@ import express from "express";
 import {IPreRegister, IVerifyUser} from "../interface/user.interface";
 import {userModel} from "../models/user.model";
 import { otpModel } from "../models/otp.model";
+import { Types } from "mongoose";
 
 export class UserRepositories {
     static createUser = async(user: IPreRegister) =>{
@@ -13,6 +14,19 @@ export class UserRepositories {
 
     }
 
+    static updateUser = async (userId: Types.ObjectId) => {
+    const response = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        is_verified: true,
+      },
+      { new: true }
+    );
+    if (!response) return null;
+
+    return response;
+  };
+
     static saveOtp = async(email: string, otp: string) =>{
         const response = await otpModel.findOneAndUpdate(
             {email},
@@ -21,5 +35,16 @@ export class UserRepositories {
         );
         return response;
     }
+
+    static otpVerify = async (email: string, otp: string) => {
+    const response = await otpModel.findOneAndDelete({ email, otp });
+    if (!response) return null;
+    return response;
+  };
+
+  static findUserByEmail = async(email: string) =>{
+    const response = await userModel.findOne({email});
+    return response;
+  }
 
 }

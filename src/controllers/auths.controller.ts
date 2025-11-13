@@ -21,5 +21,14 @@ export class AuthControllers {
         }
 
     }
+
+    static register = asyncWrapper(async(req: IRequest, res:Response) =>{
+        const user = req.body;
+        const response = await UserServices.register(user);
+        res.status(200).json({
+            success: true,
+            payload: response
+        })
+    });
     
 }
