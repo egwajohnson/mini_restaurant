@@ -1,13 +1,19 @@
 import { IPreReg, IVerify } from "../interface/user.interface";
 import { throwCustomError } from "../middleware/errorHandler";
 import { userModel } from "../models/user.model";
+import Jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { preRegValidate, regValidate } from "../validation/user.validate";
+import {
+  loginValidate,
+  preRegValidate,
+  regValidate,
+} from "../validation/user.validate";
 import { UserRepo } from "../repository/user.repo";
 import crypto from "crypto";
 import { CustomerRepo } from "../repository/customer.repo";
 import { RestaurantRepo } from "../repository/restaurant.repo";
 import { otpModel } from "../models/otp.model";
+import { jwt_exp, jwt_secret } from "../config/system.variable";
 
 export class UserServices {
   static preRegister = async (user: IPreReg) => {
@@ -47,10 +53,10 @@ export class UserServices {
     }
     //gen otp
     const otp = await UserServices.genOtp(user.email);
-    //hash otp
-    // const hashOtp = await bcrypt.hash(otp.toString(), 2);
+
     //save Otp
     const saveOtp = await UserRepo.saveOtp(user.email, otp);
+    //sendmail - TODO
 
     return "Account Created";
   };
@@ -90,6 +96,41 @@ export class UserServices {
       { new: true }
     );
     return "Account is now Verified. login";
+  };
+
+  static login = async (
+    email: string,
+    password: string,
+    ipAddress: string,
+    userAgent: string
+  ) => {
+    const { error } = loginValidate.validate({ email, password });
+    if (error) throw throwCustomError(error.message, 422);
+    //check email
+    const user = await userModel.findOne({ email: email });
+    if (!user) throw throwCustomError("Invalid account", 500);
+    //check password
+    const hashedPassword = await bcrypt.compare(
+      password,
+      user.password as string
+    );
+    if (!hashedPassword) throw throwCustomError("Invalid email/password", 422);
+    const payload = {
+      userId: user._id,
+      userType: user.role,
+    };
+
+    let jwtKey = Jwt.sign(payload, jwt_secret, { expiresIn: jwt_exp as any });
+    if (!jwtKey) {
+      throw throwCustomError("unable to log in", 500);
+    }
+
+    //send mail - TODO
+
+    return {
+      message: "Login Successful",
+      authkey: jwtKey,
+    };
   };
 
   static genOtp = async (email: string): Promise<any> => {

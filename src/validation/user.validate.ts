@@ -22,3 +22,7 @@ export const regValidate = Joi.object({
   email: Joi.string().required().email().trim(),
   otp: Joi.string().required().trim(),
 });
+export const loginValidate = Joi.object({
+  email: Joi.string().required().email().trim(),
+  password: Joi.string().required().trim().min(8),
+});

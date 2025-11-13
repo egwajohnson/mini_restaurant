@@ -10,7 +10,7 @@ export class MenuItemService {
     restaurantId: Types.ObjectId,
     files: any
   ) => {
-    console.log(menu);
+    console.log("menu is", menu);
     const { error } = menuItem.validate(menu);
     if (error) {
       throw throwCustomError(error.message, 422);

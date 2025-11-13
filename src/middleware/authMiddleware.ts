@@ -27,6 +27,7 @@ export const authMiddleware = (
       return res.sendStatus(401);
     }
     const user = await userModel.findById(new Types.ObjectId(data.userId));
+    console.log(data);
     if (!user) return res.sendStatus(401);
     req.user = {
       email: user.email as string,

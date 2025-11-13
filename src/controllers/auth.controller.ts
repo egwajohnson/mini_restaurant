@@ -14,4 +14,17 @@ export class AuthContoller {
     const response = await UserServices.register(data);
     res.status(200).json({ success: true, payload: response });
   });
+
+  static login = asyncWrapper(async (req: IRequest, res: Response) => {
+    const { email, password } = req.body;
+    const ipAddress = req.ip as string;
+    const userAgent = req.headers["user-agent"] as string;
+    const response = await UserServices.login(
+      email,
+      password,
+      ipAddress,
+      userAgent
+    );
+    res.status(200).json({ success: true, payload: response });
+  });
 }
