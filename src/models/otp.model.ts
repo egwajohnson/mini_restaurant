@@ -1,12 +1,13 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-const otpSchema = new Schema(
+const otpSchema: Schema = new Schema(
   {
-    userId: { type: Types.ObjectId, require: true, ref: "User" },
-    email: { type: String, require: true },
-    otp: { type: String, require: true },
-    createdAt: { type: Date, default: Date.now, expires: "1hr" },
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
+    email: { type: String, required: true },
+    otp: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now, expires: "1hr" }, // OTP expires after 1 hour
     updatedAt: { type: Date, default: Date.now },
+    //   expiresAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
