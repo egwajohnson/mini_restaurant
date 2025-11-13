@@ -25,10 +25,6 @@ export const userValidate = Joi.object({
 });
 
 export const loginValidate = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().min(7).required(),
-});
-export const loginValidate = Joi.object({
   email: Joi.string().required().email().trim(),
   password: Joi.string().required().trim().min(8),
 });
