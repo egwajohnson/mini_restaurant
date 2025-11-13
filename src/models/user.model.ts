@@ -7,7 +7,7 @@ export const userSchema = new Schema({
   password: { type: String, require: true },
   role: {
     type: String,
-    enum: ["admin", "customer", "restaurant"],
+    enum: ["customer", "restaurant"],
   },
   otp: { type: String },
   dateOfBirth: {

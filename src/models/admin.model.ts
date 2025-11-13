@@ -12,13 +12,7 @@ export const adminSchema = new Schema({
     type: String,
     default: "Admin",
   },
-  dateOfBirth: {
-    type: String,
-  },
-  bvn: {
-    type: String,
-  },
-  is_verified: { type: Boolean, require: true, default: false },
+  is_verified: { type: Boolean, require: true, default: true },
 });
 
 export const adminModel = mongoose.model("Admin", adminSchema);

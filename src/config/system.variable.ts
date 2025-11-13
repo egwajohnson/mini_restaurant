@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const PORT = process.env.PORT;
-export const dburl = process.env.DB_CONNECTION_URL;
+export const dburl = process.env.DB_CONNECTION_URL as string;
 export const jwt_secret = process.env.JWT_SECRET as string;
