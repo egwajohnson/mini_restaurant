@@ -1,0 +1,30 @@
+import Joi from "joi";
+
+export const preValidate = Joi.object({
+  firstName: Joi.string().min(2).max(30).required().trim(),
+  lastName: Joi.string().min(2).max(30).required().trim(),
+  email: Joi.string().email().required(),
+  password: Joi.string()
+    .trim()
+    .min(8)
+    .pattern(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).+$/
+    )
+    .messages({
+      "string.pattern.base":
+        "Password must include lowercase, uppercase, number and special character.",
+      "string.min": "Password must be at least 7 characters",
+    })
+    .required(),
+  role: Joi.string().valid("admin", "customer", "restaurant").required().trim(),
+});
+
+export const userValidate = Joi.object({
+  email: Joi.string().email().required(),
+  otp: Joi.string(),
+});
+
+export const loginValidate = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(7).required(),
+});

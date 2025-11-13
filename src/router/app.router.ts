@@ -1,6 +1,7 @@
 import express from "express";
 import { AdminContoller } from "../controllers/admin.controller";
 import { MenuController } from "../controllers/menu.controller";
+import {AuthControllers} from "../controllers/user.controller";
 
 const router = express.Router();
 
@@ -9,5 +10,8 @@ router.post("/admin/register", AdminContoller.createAdmin);
 
 //Menu Items
 router.post("/menu", MenuController.createMenu);
+
+//users
+router.post("/auth/pre", AuthControllers.preRegister)
 
 export default router;
