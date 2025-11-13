@@ -1,9 +1,9 @@
 import Joi from "joi";
 
-export const preValidate = Joi.object({
-  firstName: Joi.string().min(2).max(30).required().trim(),
-  lastName: Joi.string().min(2).max(30).required().trim(),
-  email: Joi.string().email().required(),
+export const preRegValidate = Joi.object({
+  firstName: Joi.string().trim().max(20).required(),
+  lastName: Joi.string().trim().max(20).required(),
+  email: Joi.string().email().trim().required(),
   password: Joi.string()
     .trim()
     .min(8)

@@ -2,10 +2,10 @@ import mongoose, { Schema, Types } from "mongoose";
 
 const restaurantSchema = new Schema({
   userId: { type: Types.ObjectId, require: true, unique: true, ref: "User" },
-  displayName: { type: String, require: true },
+  restaurantName: { type: String, require: true },
   slug: {
     userId: { type: Types.ObjectId, require: true, ref: "User" },
-    displayName: { type: String, require: true },
+    restaurantName: { type: String, require: true },
   },
   bio: { type: String },
   logoUrl: { type: String },

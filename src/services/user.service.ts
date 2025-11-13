@@ -1,7 +1,7 @@
 
 import {UserRepositories} from "../repository/auth.repository"
 import {IPreRegister, IVerifyUser} from "../interface/user.interface";
-import {preValidate,userValidate,loginValidate } from "../validation/user.validate";
+import {preRegValidate,userValidate,loginValidate } from "../validation/user.validate";
 import {throwCustomError} from "../middleware/errorHandler";
 import bcrypt from "bcrypt";
 import { otpModel } from "../models/otp.model";
@@ -12,7 +12,7 @@ export class UserServices {
         if(!user){
             throw new Error("Invalid user data");
         }
-        const {error} = preValidate.validate(user);
+        const {error} = preRegValidate.validate(user);
         if(error){
             throw throwCustomError(error.details[0].message, 400 );
         }

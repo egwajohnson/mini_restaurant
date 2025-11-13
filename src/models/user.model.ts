@@ -13,9 +13,7 @@ export const userSchema = new Schema({
   dateOfBirth: {
     type: String,
   },
-  nin: {
-    type: String,
-  },
+  is_kyc_verified: { type: Boolean, default: false },
   bvn: {
     type: String,
   },
