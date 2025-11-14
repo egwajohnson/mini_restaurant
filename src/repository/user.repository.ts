@@ -27,6 +27,12 @@ export class UserRepositories {
     return response;
   };
 
+   static createOtp = async (email: string, otp: string) => {
+      const response = await otpModel.create(email, otp);
+      if (!response) return null;
+      return response;
+    };  
+
     static saveOtp = async(email: string, otp: string) =>{
         const response = await otpModel.findOneAndUpdate(
             {email},
@@ -35,6 +41,12 @@ export class UserRepositories {
         );
         return response;
     }
+
+     static getOtp = async (email: string) => {
+        const res = await otpModel.findOne({ email });
+        if (!res) return null;
+        return res;
+      };  
 
     static otpVerify = async (email: string, otp: string) => {
     const response = await otpModel.findOneAndDelete({ email, otp });
