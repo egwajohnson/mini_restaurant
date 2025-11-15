@@ -54,6 +54,11 @@ export class UserRepositories {
     return response;
   };
 
+  static findUserId = async(userId: Types.ObjectId) =>{
+    const response = await userModel.findByIdAndDelete(userId);
+    return response;
+  }
+
   static findUserByEmail = async(email: string) =>{
     const response = await userModel.findOne({email});
     return response;

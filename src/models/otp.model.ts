@@ -7,7 +7,7 @@ const otpSchema: Schema = new Schema(
     otp: { type: String, required: true },
     createdAt: { type: Date, default: Date.now, expires: "1hr" }, // OTP expires after 1 hour
     updatedAt: { type: Date, default: Date.now },
-    //   expiresAt: { type: Date, default: Date.now },
+     expiresAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

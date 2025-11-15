@@ -27,7 +27,6 @@ export class UserServices {
     if (error) {
       throw throwCustomError(error.details[0].message, 400);
     }
-
     //check acct existence
     const isExist = await userModel.findOne({ email: user.email });
     if (isExist) {
@@ -66,9 +65,11 @@ export class UserServices {
     if (!otp) {
       throw throwCustomError("OTP generation failed", 500);
     }
+
     //hash otp
     const hashedOtp = await bcrypt.hash(otp.toString(), 5);
     if (!hashedOtp) throw throwCustomError("OTP hashing failed", 400);
+
     //save otp
     const savedOtp = await UserRepositories.saveOtp(user.email, hashedOtp);
     if (!savedOtp) {
