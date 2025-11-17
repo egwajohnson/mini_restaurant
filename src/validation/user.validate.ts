@@ -13,10 +13,10 @@ export const preRegValidate = Joi.object({
     .messages({
       "string.pattern.base":
         "Password must include lowercase, uppercase, number and special character.",
-      "string.min": "Password must be at least 7 characters",
+      "string.min": "Password must be at least 8 characters",
     })
     .required(),
-  role: Joi.string().valid("admin", "customer", "restaurant").required().trim(),
+  role: Joi.string().valid("customer", "restaurant").required().trim(),
 });
 
 export const userValidate = Joi.object({

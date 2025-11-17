@@ -1,6 +1,7 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 export const adminSchema = new Schema({
+  adminId: { type: Types.ObjectId, require: true },
   firstName: {
     type: String,
     require: true,
@@ -10,9 +11,11 @@ export const adminSchema = new Schema({
   password: { type: String, require: true },
   role: {
     type: String,
-    default: "Admin",
+    enum: ["admin", "superAdmin"],
+    default: "admin",
   },
   is_verified: { type: Boolean, require: true, default: true },
+  isAuthorized: { type: Boolean, require: true, default: false },
 });
 
 export const adminModel = mongoose.model("Admin", adminSchema);

@@ -17,3 +17,12 @@ export const adminValidate = Joi.object({
     })
     .required(),
 });
+
+export const upgradeAdmin = Joi.object({
+  email: Joi.string().email().trim().required(),
+  role: Joi.string().valid("admin", "superAdmin").required(),
+});
+
+export const emailValidate = Joi.object({
+  email: Joi.string().email().trim().required(),
+});
