@@ -39,7 +39,7 @@ export class UserServices {
     const response = await UserRepositories.createUser({
       ...user,
       password: hashedPassword,
-      is_verified: false,
+    
     });
     if (!response) {
       throw throwCustomError("User registration failed", 500);

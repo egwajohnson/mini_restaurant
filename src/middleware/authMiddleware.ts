@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 import jwt from "jsonwebtoken";
 import { jwt_secret } from "../config/system.variable";
 import { userModel } from "../models/user.model";
+import { adminModel } from "../models/admin.model";
 
 export interface IRequest extends Request {
   user: {
@@ -36,7 +37,9 @@ export const authMiddleware = (
       role: user.role as string,
     };
     next();
+    const admin = await adminModel.findById(new Types.ObjectId(data.adminId))
   });
+  
 };
 
 export const adminMiddleware = (

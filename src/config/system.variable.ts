@@ -5,3 +5,4 @@ export const PORT = process.env.PORT;
 export const dburl = process.env.DB_CONNECTION_URL as string;
 export const jwt_secret = process.env.JWT_SECRET as string;
 export const jwt_exp = process.env.JWT_EXP as string;
+export const admin_jwt_secret = process.env.ADMIN_JWT_SECRET as string;

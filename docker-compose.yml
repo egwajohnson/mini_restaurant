@@ -1,0 +1,20 @@
+
+services:
+  app:
+    container_name: mini-restaurant
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27018:27017"
+ 

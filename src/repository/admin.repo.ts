@@ -13,4 +13,10 @@ export class AdminRepo {
     if (!response) return null;
     return response;
   };
+
+  static upgradeAdmin = async (filter: any, update: any) => {
+    const response = adminModel.findOneAndUpdate(filter, update, { new: true });
+    if (!response) return null;
+    return response;
+  };
 }

@@ -7,7 +7,7 @@ export const userSchema = new Schema({
   password: { type: String, require: true },
   role: {
     type: String,
-    enum: ["admin","customer", "restaurant"],
+    enum: ["customer", "restaurant"],
   },
   otp: { type: String },
   dateOfBirth: {
@@ -22,6 +22,5 @@ export const userSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
- const userModel = mongoose.model("User", userSchema);
-export {userModel};
-
+const userModel = mongoose.model("User", userSchema);
+export { userModel };
