@@ -14,8 +14,6 @@ router.post("/auth/admin/register", AdminContoller.createAdmin);
 router.post("/auth/pre-register", AuthControllers.preRegister as any);
 router.post("/auth/register", AuthControllers.register);
 router.post("/auth/login", AuthControllers.login);
-//router.post("/auth/pre", AuthControllers.preRegister)
-//router.post("/auth/register", AuthControllers.register);
 
 
 //Menu Items

@@ -108,7 +108,11 @@ export class UserServices {
     if (!UserExist) {
       throw throwCustomError("User not found", 404);
     }
-
+    // hash otp
+    const getotp = await UserRepositories.getOtp(user.otp);
+    if (!getotp) {
+      throw throwCustomError("OTP not found, please generate a new one", 404);
+    }
     // verify otp
     const isOtpValid = await UserRepositories.otpVerify(user.email, user.otp);
     if (!isOtpValid) {
