@@ -1,3 +1,4 @@
+import Types from "joi";
 export interface IPreRegister {
   firstName: string;
   lastName: string;
@@ -9,4 +10,10 @@ export interface IPreRegister {
 export interface IVerifyUser {
   email: string;
   otp: string;
+}
+
+export interface updateUser{
+  firstName:string;
+  lastName:string;
+
 }

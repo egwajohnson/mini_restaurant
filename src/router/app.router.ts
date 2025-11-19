@@ -53,6 +53,8 @@ router.get(
 router.post("/auth/pre-register", AuthControllers.preRegister as any);
 router.post("/auth/register", AuthControllers.register);
 router.post("/auth/login", AuthControllers.login);
+router.post("/auth/update/user", AuthControllers.updateUser)
+router.post("/auth/reset-password", AuthControllers.resetpassword);
 
 //Menu Items
 router.post(
@@ -61,6 +63,12 @@ router.post(
   restaurantMiddleware as any,
   upload.single("image") as any,
   MenuController.createMenu
+);
+
+//otp request new otp
+router.post(
+  "/auth/request-new-otp",
+  AuthControllers.requestNewOtp as any
 );
 
 export default router;

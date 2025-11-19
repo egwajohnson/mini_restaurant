@@ -1,8 +1,9 @@
 import express from "express";
-import {IPreRegister, IVerifyUser} from "../interface/user.interface";
+import {IPreRegister, IVerifyUser, updateUser} from "../interface/user.interface";
 import {userModel} from "../models/user.model";
 import { otpModel } from "../models/otp.model";
 import { Types } from "mongoose";
+import { AnyCaaRecord } from "dns";
 
 export class UserRepositories {
     static createUser = async(user: IPreRegister) =>{
@@ -14,18 +15,25 @@ export class UserRepositories {
 
     }
 
-    static updateUser = async (userId: Types.ObjectId) => {
-    const response = await userModel.findByIdAndUpdate(
-      userId,
-      {
-        is_verified: true,
-      },
-      { new: true }
-    );
-    if (!response) return null;
+    static getUserById = async(userId: Types.ObjectId) =>{
+        const response = await userModel.findById(
+          userId,
+          {
+            is_verified: true,
+          }
+        );
+        if(!response) return null;
+        return response;
+    }
 
+    static updateUser = async (userId:Types.ObjectId,updateData:updateUser) => {
+    const response = await userModel.findByIdAndUpdate(
+      userId, 
+      {$set: updateData},
+       { new: true }).select("-password -__v");
     return response;
   };
+
 
    static createOtp = async (email: string, otp: string) => {
       const response = await otpModel.create(email, otp);
@@ -42,11 +50,17 @@ export class UserRepositories {
         return response;
     }
 
-     static getOtp = async (email: string) => {
+     static getOtp = async (email: string,) => {
         const res = await otpModel.findOne({ email });
         if (!res) return null;
         return res;
       };  
+
+      static requestotp = async(email:string, otp:string) =>{
+        const response = await otpModel.findOneAndUpdate({email, otp});
+        if(!response) return null;
+        return response;
+      }
 
     static otpVerify = async (email: string, otp: string) => {
     const response = await otpModel.findOneAndDelete({ email, otp });
@@ -64,4 +78,13 @@ export class UserRepositories {
     return response;
   }
 
+static resetPassword = async (email:string,newpassword:string, otp:string) => {
+  const response = await userModel.findOneAndUpdate(
+     { email },
+      { password: newpassword, is_verified: true },
+      {  otp, createdAt: new Date(), new: true, upsert: true  },
+  );
+  return response
+
+}
 }

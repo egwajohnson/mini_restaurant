@@ -24,6 +24,10 @@ export const userValidate = Joi.object({
   otp: Joi.string(),
 });
 
+export const updateUserValidate = Joi.object({
+  email:Joi.string().email().required(),
+});
+
 export const loginValidate = Joi.object({
   email: Joi.string().required().email().trim(),
   password: Joi.string().required().trim().min(8),

@@ -1,9 +1,10 @@
 import { UserRepositories } from "../repository/user.repository";
-import { IPreRegister, IVerifyUser } from "../interface/user.interface";
+import { IPreRegister, IVerifyUser, updateUser } from "../interface/user.interface";
 import {
   preRegValidate,
   userValidate,
   loginValidate,
+  updateUserValidate
 } from "../validation/user.validate";
 import { throwCustomError } from "../middleware/errorHandler";
 import bcrypt from "bcrypt";
@@ -17,6 +18,7 @@ import { otpTemplate } from "../utils/otp-template";
 import { RestaurantRepo } from "../repository/restaurant.repo";
 import {CustomerRepo} from "../repository/customer.repo"
 import crypto from "crypto";
+import mongoose,{ Types } from "mongoose";
 
 export class UserServices {
   static preRister = async (user: IPreRegister) => {
@@ -108,20 +110,95 @@ export class UserServices {
     if (!UserExist) {
       throw throwCustomError("User not found", 404);
     }
-
+    // hash otp
+    const getotp = await UserRepositories.getOtp(user.otp);
+    if (!getotp) {
+      throw throwCustomError("OTP not found, please generate a new one", 404);
+    }
     // verify otp
     const isOtpValid = await UserRepositories.otpVerify(user.email, user.otp);
     if (!isOtpValid) {
       throw throwCustomError("Invalid OTP", 400);
     }
 
-    const updatedUser = await UserRepositories.updateUser(UserExist._id);
-    if (!updatedUser) {
+    const verifyUser = await UserRepositories.getUserById(UserExist._id);
+    if (!verifyUser) {
       throw throwCustomError("Unable to verify account", 500);
     }
 
     return "Account is verified, You can now login";
   };
+
+  static updateUser = async (userId:Types.ObjectId, updateData:updateUser)=> {
+    if(!userId) throw throwCustomError("User ID is required", 400);
+    const response = await UserRepositories.updateUser( userId, updateData);
+    if(!response){
+      throw throwCustomError("server not responding", 404);
+    }
+    return response;
+
+  }
+
+  static requestNewOtp = async (email: string) => {
+    const { error } = userValidate.validate({ email });
+    if (error) {
+      throw throwCustomError(error.message, 422);
+    }
+    if(!email){
+      throw throwCustomError("Email is required", 422);
+    }
+    const user = await UserRepositories.findUserByEmail(email);
+    if (!user) {
+      throw throwCustomError("User not found", 404);
+    }
+
+    const otps = await UserServices.generateOtp(email);
+    console.log("do not share with anyone", otps);
+    if (!otps) {
+      throw throwCustomError("OTP generation failed", 500);
+    }
+     // send otp via mail
+    sendMail(
+      {
+        email: email,
+        subject: "REQUEST OTP VERIFICATION",
+        emailInfo: {
+          otp: otps.toString(),
+          name: `${user.firstName} ${user.lastName}`,
+        },
+      },
+      otpTemplate
+    );
+    return "New OTP has been sent to your email";
+  };
+  
+  static resetpassword = async (email:string,otp:string,newPassword:string) =>{
+    if(!email || !newPassword || !otp){
+      throw throwCustomError("All fields are required", 422);
+    }
+    const { error } = userValidate.validate({ email });
+    if (error) {
+      throw throwCustomError(error.message, 422);
+    }
+      // check if user exists
+    const user = await UserRepositories.findUserByEmail(email);
+    if (!user) {
+      throw throwCustomError("User not found", 404);
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 5);
+    if (!hashedPassword) throw throwCustomError("Password hashing failed", 400);
+
+    const getotp = await UserRepositories.requestotp(email, otp);
+    if (!getotp) {
+      throw throwCustomError("OTP not found, please generate a new one", 404);
+    }
+    const response = await UserRepositories.resetPassword(email, hashedPassword, otp );
+    if(!response){
+      throw throwCustomError("Unable to reset password", 500);
+    } 
+
+    return "Password reset successful, you can now login with your new password";
+  }
 
   static login = async (
     email: string,
@@ -133,6 +210,7 @@ export class UserServices {
     if (error) throw throwCustomError(error.message, 422);
     //check email
     const user = await userModel.findOne({ email: email });
+    console.log(user);
     if (!user) throw throwCustomError("Invalid account", 500);
     //check password
     const hashedPassword = await bcrypt.compare(
@@ -149,9 +227,7 @@ export class UserServices {
     if (!jwtKey) {
       throw throwCustomError("unable to log in", 500);
     }
-
     //send mail - TODO
-
       sendMail(
       {
         email: email,
