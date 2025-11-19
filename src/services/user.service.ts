@@ -7,7 +7,7 @@ import {
   updateUserValidate
 } from "../validation/user.validate";
 import { throwCustomError } from "../middleware/errorHandler";
-import bcrypt from "bcrypt";
+import bcrypt, { compare } from "bcrypt";
 import Jwt from "jsonwebtoken";
 import { jwt_exp, jwt_secret } from "../config/system.variable";
 import { userModel } from "../models/user.model";
@@ -110,11 +110,7 @@ export class UserServices {
     if (!UserExist) {
       throw throwCustomError("User not found", 404);
     }
-    // hash otp
-    const getotp = await UserRepositories.getOtp(user.otp);
-    if (!getotp) {
-      throw throwCustomError("OTP not found, please generate a new one", 404);
-    }
+
     // verify otp
     const isOtpValid = await UserRepositories.otpVerify(user.email, user.otp);
     if (!isOtpValid) {
@@ -125,6 +121,8 @@ export class UserServices {
     if (!verifyUser) {
       throw throwCustomError("Unable to verify account", 500);
     }
+
+    await UserRepositories.updateUsers(UserExist._id);
 
     return "Account is verified, You can now login";
   };
