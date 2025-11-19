@@ -1,3 +1,4 @@
 node_modules
 .env
 uploads
+src/services/user.services.ts

@@ -3,8 +3,11 @@ import { throwCustomError } from "../middleware/errorHandler";
 import { AdminRepo } from "../repository/admin.repo";
 import bcrypt from "bcrypt";
 import {
+  adminLoginvalidate,
   adminValidate,
   emailValidate,
+  profileValidate,
+  pwdValidate,
   upgradeAdmin,
 } from "../validation/admin.validate";
 import { loginValidate } from "../validation/user.validate";
@@ -15,6 +18,8 @@ import {
   jwt_exp,
   jwt_secret,
 } from "../config/system.variable";
+import { error } from "console";
+import { Types } from "mongoose";
 
 export class AdminService {
   static createAdmin = async (admin: IAdminReg) => {
@@ -44,17 +49,28 @@ export class AdminService {
 
   static adminLogin = async (
     email: string,
+    username: string,
     password: string,
     ipAddress: string,
     userAgent: string
   ) => {
-    const { error } = loginValidate.validate({ email, password });
+    const { error } = adminLoginvalidate.validate({
+      email,
+      username,
+      password,
+    });
     if (error) throw throwCustomError(error.message, 422);
     //data to lowercase
     email = email.toLowerCase();
-    //check email validity
+    // if (username) {
+    //   // check username
+    //   const userName = await adminModel.findOne({ username: username });
+    //   if (!userName) throw throwCustomError("Invalid Account", 422);
+    // }
+    // check email validity
     const admin = await AdminRepo.findAdminByEmail(email);
     if (!admin) throw throwCustomError("Invalid account", 500);
+
     //compare password
     const hashedPassword = await bcrypt.compare(
       password,
@@ -99,6 +115,45 @@ export class AdminService {
     return "Your account has been Upgraded";
   };
 
+  static profile = async (id: Types.ObjectId, update: any) => {
+    const { error } = profileValidate.validate(update);
+    if (error) throw throwCustomError(error.message, 422);
+    const admin = await adminModel.findByIdAndUpdate({ _id: id }, update, {
+      new: true,
+    });
+    if (!admin) throw throwCustomError("Unable to save changes", 500);
+    return "Changes Saved";
+  };
+
+  static changePassword = async (
+    email: string,
+    password: string,
+    update: { password: string; confirmPassword: string }
+  ) => {
+    const { error } = pwdValidate.validate(update);
+    if (error) throw throwCustomError(error.message, 422);
+    //check previous password validity
+    const admin = await adminModel.findOne({ email: email });
+    if (!admin) throw throwCustomError("Invalid", 422);
+    const isPwdValid = await bcrypt.compare(password, admin.password as string);
+    if (!isPwdValid) throw throwCustomError("Invalid Password", 422);
+    //match new passwords
+    if (update.confirmPassword !== update.password) {
+      throw throwCustomError("Password do not match", 422);
+    }
+    //hash new password
+    const hashPwd = await bcrypt.hash(update.confirmPassword, 5);
+    if (!hashPwd) throw throwCustomError("Unable to hash password", 400);
+    //save password
+    const response = await adminModel.findOneAndUpdate(
+      { email: email },
+      { password: hashPwd },
+      { new: true }
+    );
+    if (!response) throw throwCustomError("unable to change password", 422);
+
+    return "Password Changed";
+  };
   static deleteAdmin = async (email: string) => {
     email = email.toLowerCase();
     //check  admin existence

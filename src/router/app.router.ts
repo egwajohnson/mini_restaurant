@@ -12,6 +12,7 @@ import {
   adminAuthMiddleware,
   superAdminMiddleware,
 } from "../middleware/adminAuthMiddleware";
+import { upload } from "../config/multer.config";
 
 const router = express.Router();
 
@@ -23,6 +24,17 @@ router.patch(
   "/auth/admin/upgrade",
   adminAuthMiddleware as any,
   AdminAuthContoller.upgradeAdmin
+);
+router.patch(
+  "/auth/admin/profile",
+  adminAuthMiddleware as any,
+  AdminAuthContoller.profile
+);
+
+router.patch(
+  "/auth/admin/password",
+  adminAuthMiddleware as any,
+  AdminAuthContoller.changePassword
 );
 router.delete(
   "/auth/admin/delete",
@@ -47,6 +59,7 @@ router.post(
   "/menu",
   authMiddleware as any,
   restaurantMiddleware as any,
+  upload.single("image") as any,
   MenuController.createMenu
 );
 

@@ -8,6 +8,6 @@ export interface IMenuItem {
   discountPrice?: number;
   category: string;
   isOpen?: boolean;
-  images: string;
+  images?: string;
   restaurantId: Types.ObjectId;
 }
