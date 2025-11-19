@@ -5,11 +5,13 @@ import { PORT } from "./config/system.variable";
 import router from "./router/app.router";
 import { handleCustomError } from "./middleware/errorHandler";
 import { mongoConnection } from "./config/db.connection";
+import path from "path";
 
 const app = express();
 app.use(express.json());
 app.use("/api/v1", router);
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 //error handler
 app.use(handleCustomError);
 

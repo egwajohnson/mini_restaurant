@@ -5,16 +5,11 @@ import { MenuItemService } from "../services/menu.item.services";
 
 export class MenuController {
   static createMenu = asyncWrapper(async (req: IRequest, res: Response) => {
-    const menu = req.body;
     const restaurantId = req.user.id;
-    const files = req.file?.originalname;
-    console.log(menu);
-    const response = await MenuItemService.createMenu(
-      menu,
-      restaurantId,
-      files
-    );
-
+    const data = req.body;
+    const path = req.file?.originalname;
+    if (!path) return null;
+    const response = await MenuItemService.createMenu(data, restaurantId, path);
     res.status(200).json({ success: true, payload: response });
   });
 }
