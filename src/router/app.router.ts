@@ -36,6 +36,8 @@ router.patch(
   adminAuthMiddleware as any,
   AdminAuthContoller.changePassword
 );
+router.post("/auth/admin/forgot-password", AdminAuthContoller.forgotPassword);
+router.post("/auth/admin/reset-password", AdminAuthContoller.resetPassword);
 router.delete(
   "/auth/admin/delete",
   adminAuthMiddleware as any,
@@ -53,7 +55,7 @@ router.get(
 router.post("/auth/pre-register", AuthControllers.preRegister as any);
 router.post("/auth/register", AuthControllers.register);
 router.post("/auth/login", AuthControllers.login);
-router.post("/auth/update/user", AuthControllers.updateUser)
+router.post("/auth/update/user", AuthControllers.updateUser);
 router.post("/auth/reset-password", AuthControllers.resetpassword);
 
 //Menu Items
@@ -66,9 +68,6 @@ router.post(
 );
 
 //otp request new otp
-router.post(
-  "/auth/request-new-otp",
-  AuthControllers.requestNewOtp as any
-);
+router.post("/auth/request-new-otp", AuthControllers.requestNewOtp as any);
 
 export default router;

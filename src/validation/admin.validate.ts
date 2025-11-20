@@ -62,3 +62,35 @@ export const pwdValidate = Joi.object({
     })
     .required(),
 });
+export const resetPwdValid = Joi.object({
+  email: Joi.string().email().required(),
+  otp: Joi.number().required(),
+  password: Joi.string()
+    .trim()
+    .min(8)
+    .pattern(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).+$/
+    )
+    .messages({
+      "string.pattern.base":
+        "Password must include lowercase, uppercase, number and special character.",
+      "string.min": "Password must be at least 8 characters",
+    })
+    .required(),
+  confirm: Joi.string()
+    .trim()
+    .min(8)
+    .pattern(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).+$/
+    )
+    .messages({
+      "string.pattern.base":
+        "Password must include lowercase, uppercase, number and special character.",
+      "string.min": "Password must be at least 8 characters",
+    })
+    .required(),
+});
+
+export const adminValid = Joi.object({
+  email: Joi.string().email().required(),
+});

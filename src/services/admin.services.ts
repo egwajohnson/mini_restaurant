@@ -8,18 +8,17 @@ import {
   emailValidate,
   profileValidate,
   pwdValidate,
+  resetPwdValid,
   upgradeAdmin,
 } from "../validation/admin.validate";
-import { loginValidate } from "../validation/user.validate";
+
 import { adminModel } from "../models/admin.model";
 import Jwt from "jsonwebtoken";
-import {
-  admin_jwt_secret,
-  jwt_exp,
-  jwt_secret,
-} from "../config/system.variable";
-import { error } from "console";
+import { admin_jwt_secret, jwt_exp } from "../config/system.variable";
+import crypto from "crypto";
+
 import { Types } from "mongoose";
+import { adminOtpModel } from "../models/otp.model";
 
 export class AdminService {
   static createAdmin = async (admin: IAdminReg) => {
@@ -154,6 +153,58 @@ export class AdminService {
 
     return "Password Changed";
   };
+  static forgotPassword = async (email: string) => {
+    const { error } = emailValidate.validate({ email });
+    if (error) throw throwCustomError(error.message, 400);
+    const admin = await adminModel.findOne({ email });
+    if (!admin) throw throwCustomError("Invalid Email", 422);
+    const res = await AdminService.genOtp(email);
+    if (!res) throw throwCustomError("Unable to generate Otp", 400);
+    return "An Otp has been sent to you";
+  };
+  static verifyOtp = async (email: string, otp: string) => {
+    const res = await adminModel.findOne({ email });
+    if (!res) throw throwCustomError("Invalid email", 422);
+    const isOtp = await adminOtpModel.findOne({ otp });
+    if (!isOtp) throw throwCustomError("Invalid Otp", 422);
+    return isOtp;
+  };
+  static resetPassword = async (data: {
+    email: string;
+    otp: string;
+    password: string;
+    confirm: string;
+  }) => {
+    console.log(data.otp);
+    console.log(data.password);
+
+    const { error } = resetPwdValid.validate(data);
+    if (error) throw throwCustomError(error.message, 400);
+    //check account exist...
+    const admin = await AdminRepo.findAdminByEmail(data.email);
+    if (!admin) throw throwCustomError("Invalid account", 422);
+    //OTP must be a number
+    // if (isNaN(parseInt(data.otp)))
+    //   throw throwCustomError("Otp must be digits", 422);
+    //validate otp
+    const isOtpValid = await adminOtpModel.findOne({
+      email: data.email,
+      otp: data.otp,
+    });
+    if (!isOtpValid) throw throwCustomError("Invalid Otp", 400);
+    if (data.confirm !== data.password) {
+      throw throwCustomError("Password do not match", 400);
+    }
+    //hash password
+    const hashPwd = await bcrypt.hash(data.confirm, 10);
+    //save new password
+    const response = await adminModel.findOneAndUpdate(
+      { email: data.email },
+      { password: hashPwd },
+      { new: true }
+    );
+    return "Password has been reset";
+  };
   static deleteAdmin = async (email: string) => {
     email = email.toLowerCase();
     //check  admin existence
@@ -164,6 +215,12 @@ export class AdminService {
     const response = await adminModel.findOneAndDelete({ email: admin.email });
     if (!response) throw throwCustomError("Unable to delete account", 500);
     return "Account Deleted successfully";
+  };
+  static genOtp = async (email: string) => {
+    const otp = crypto.randomInt(100000, 999999);
+    console.log(otp);
+    await adminOtpModel.create({ email, otp });
+    return otp;
   };
 
   static getAdmin = async () => {
