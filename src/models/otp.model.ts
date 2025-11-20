@@ -1,6 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 
-const otpSchema: Schema = new Schema(
+const otpSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User" },
     email: { type: String, required: true },
@@ -15,7 +15,7 @@ const otpSchema: Schema = new Schema(
 export const otpModel = mongoose.model("Otp", otpSchema);
 
 //*****************|| ADMIN OTP MODEL||**************/
-const adminOtpSchema: Schema = new Schema(
+const adminOtpSchema = new Schema(
   {
     adminId: { type: Types.ObjectId, ref: "Admin" },
     email: { type: String, required: true },
