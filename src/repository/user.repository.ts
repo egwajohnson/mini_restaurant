@@ -34,6 +34,19 @@ export class UserRepositories {
     return response;
   };
 
+  static updateUsers = async (userId: Types.ObjectId) => {
+    const response = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        is_verified: true,
+      },
+      { new: true }
+    );
+    if (!response) return null;
+
+    return response;
+  };
+
 
    static createOtp = async (email: string, otp: string) => {
       const response = await otpModel.create(email, otp);
