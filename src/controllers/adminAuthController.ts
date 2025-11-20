@@ -13,7 +13,6 @@ export class AdminAuthContoller {
 
   static login = asyncWrapper(async (req: IARequest, res: Response) => {
     const { email, username, password } = req.body;
-    console.log(req.body);
     const ipAddress = req.ip as string;
     const userAgent = req.headers["user-agent"] as string;
     const response = await AdminService.adminLogin(
@@ -35,7 +34,6 @@ export class AdminAuthContoller {
   static profile = asyncWrapper(async (req: IARequest, res: Response) => {
     const id = req.admin.id;
     const { update } = req.body;
-    console.log("req.", req.body);
     const response = await AdminService.profile(id, update);
     res.status(201).json({ Success: true, payload: response });
   });
@@ -51,6 +49,23 @@ export class AdminAuthContoller {
       res.status(201).json({ Success: true, payload: response });
     }
   );
+  static forgotPassword = asyncWrapper(
+    async (req: IARequest, res: Response) => {
+      const { email } = req.body;
+      const response = await AdminService.forgotPassword(email);
+      res.status(201).json({ success: true, payload: response });
+    }
+  );
+  static resetPassword = asyncWrapper(async (req: IARequest, res: Response) => {
+    const { email, otp, password, confirm } = req.body;
+    const response = await AdminService.resetPassword({
+      email,
+      otp,
+      password,
+      confirm,
+    });
+    res.status(200).json({ success: true, payload: response });
+  });
   static deleteAdmin = asyncWrapper(async (req: IARequest, res: Response) => {
     const { email } = req.body;
     const response = await AdminService.deleteAdmin(email);

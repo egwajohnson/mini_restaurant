@@ -6,6 +6,7 @@ export const adminSchema = new Schema({
     type: String,
     require: true,
   },
+  otp: { type: String },
   lastName: { type: String, require: true },
   email: { type: String, require: true, unique: true },
   username: { type: String, require: true, unique: true },
