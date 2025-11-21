@@ -231,7 +231,7 @@ export class UserServices {
     if (error) throw throwCustomError(error.message, 422);
     //check email
     const user = await userModel.findOne({ email: email });
-    console.log(user);
+
     if (!user) throw throwCustomError("Invalid account", 500);
     //check password
     const hashedPassword = await bcrypt.compare(

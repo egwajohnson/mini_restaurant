@@ -37,9 +37,8 @@ export const authMiddleware = (
       role: user.role as string,
     };
     next();
-    const admin = await adminModel.findById(new Types.ObjectId(data.adminId))
+    const admin = await adminModel.findById(new Types.ObjectId(data.adminId));
   });
-  
 };
 
 export const adminMiddleware = (
@@ -80,8 +79,11 @@ export const restaurantMiddleware = (
   if (!user) return res.sendStatus(403);
   if (user.role !== "restaurant") {
     return res
-      .sendStatus(403)
-      .json({ payload: "You are not authorized to access this resources" });
+      .status(403)
+      .json({
+        success: false,
+        payload: "You are not authorized to access this resources",
+      });
   }
   next();
 };

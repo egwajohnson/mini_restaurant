@@ -31,17 +31,15 @@ export class AuthControllers {
 
   static updateUser = asyncWrapper(async (req: IRequest, res: Response) => {
     try {
-     const { userId, ...updateData } = req.body;
+      const { userId, ...updateData } = req.body;
       console.log(userId);
-      const response = await UserServices.updateUser( userId, updateData);
-      console.log(response);
+      const response = await UserServices.updateUser(userId, updateData);
       res.status(201).json({
         success: true,
         payload: response,
       });
     } catch (error: any) {
-        console.log(error)
-        res.status(400).json({success:false, messages:error.detail})
+      res.status(400).json({ success: false, messages: error.detail });
     }
   });
 
@@ -66,23 +64,21 @@ export class AuthControllers {
   static login = asyncWrapper(async (req: IRequest, res: Response) => {
     try {
       const { email, password } = req.body;
-    const ipAddress = req.ip as string;
-    const userAgent = req.headers["user-agent"] as string;
-    const response = await UserServices.login(
-      email,
-      password,
-      ipAddress,
-      userAgent
-    );
-    console.log(response);
-    res.status(200).json({ success: true, payload: response });
-      
-    } catch (error:any) {
+      const ipAddress = req.ip as string;
+      const userAgent = req.headers["user-agent"] as string;
+      const response = await UserServices.login(
+        email,
+        password,
+        ipAddress,
+        userAgent
+      );
+
+      res.status(200).json({ success: true, payload: response });
+    } catch (error: any) {
       res.status(400).json({
         success: false,
         message: error.message,
       });
     }
-
   });
 }

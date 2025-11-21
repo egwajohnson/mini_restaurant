@@ -13,6 +13,7 @@ import {
   superAdminMiddleware,
 } from "../middleware/adminAuthMiddleware";
 import { upload } from "../config/multer.config";
+import { RestaurantController } from "../controllers/restaurantController";
 
 const router = express.Router();
 
@@ -58,6 +59,19 @@ router.post("/auth/login", AuthControllers.login);
 router.post("/auth/update/user", AuthControllers.updateUser);
 router.post("/auth/reset-password", AuthControllers.resetpassword);
 
+// ***********************|| RESTAURANT MANAGT. ||********************************//
+router.post(
+  "/restaurant/verify-kyc",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  RestaurantController.kyc
+);
+router.patch(
+  "/restaurant/update",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  RestaurantController.updateRestaurant
+);
 //Menu Items
 router.post(
   "/menu",
