@@ -39,7 +39,6 @@ export class MenuItemService {
       throw throwCustomError("Price should be greater than 0 ", 400);
 
     const slug = data.name.toLowerCase().trim().replace(/\s+/g, "-");
-    console.log("slug", slug);
     const restaurant = await restaurantModel.findOne(data.restaurantId);
     //check menu existence
     const isMenu = await MenuItemRepo.findMenuBySlug(slug);
@@ -59,8 +58,6 @@ export class MenuItemService {
       restaurantId,
       images: (data.images = path),
     });
-
-    console.log("response", response);
 
     if (!response) {
       throw throwCustomError("Menu not created", 500);
