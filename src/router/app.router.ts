@@ -3,6 +3,7 @@ import { AdminAuthContoller } from "../controllers/adminAuthController";
 import { MenuController } from "../controllers/menu.controller";
 // import { AuthContoller } from "../controllers/auth.controller";
 import { AuthControllers } from "../controllers/auths.controller";
+import { cartControllers } from "../controllers/cart.controller";
 import {
   authMiddleware,
   restaurantMiddleware,
@@ -57,6 +58,8 @@ router.post("/auth/register", AuthControllers.register);
 router.post("/auth/login", AuthControllers.login);
 router.post("/auth/update/user", AuthControllers.updateUser);
 router.post("/auth/reset-password", AuthControllers.resetpassword);
+router.post("/auth/request-new-otp", AuthControllers.requestNewOtp as any);
+
 
 // ***********************|| RESTAURANT MANAGT. ||********************************//
 router.post(
@@ -86,7 +89,12 @@ router.post(
   MenuController.createMenu
 );
 
-//otp request new otp
-router.post("/auth/request-new-otp", AuthControllers.requestNewOtp as any);
+//create cart
+router.post(
+  "/cart",
+  authMiddleware as any,
+  cartControllers.createcart as any
+);
+
 
 export default router;

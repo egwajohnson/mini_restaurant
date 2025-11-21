@@ -191,6 +191,13 @@ export class AdminService {
       email: data.email,
       otp: data.otp,
     });
+
+    //compare passwords
+
+    if(data.password !== data.confirm){
+      throw throwCustomError("Password do not match", 400);
+    }
+
     if (!isOtpValid) throw throwCustomError("Invalid Otp", 400);
     if (data.confirm !== data.password) {
       throw throwCustomError("Password do not match", 400);

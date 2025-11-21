@@ -39,10 +39,11 @@ export class MenuItemService {
       throw throwCustomError("Price should be greater than 0 ", 400);
 
     const slug = data.name.toLowerCase().trim().replace(/\s+/g, "-");
+    console.log("slug", slug);
+    const restaurant = await restaurantModel.findOne(data.restaurantId);
     //check menu existence
     const isMenu = await MenuItemRepo.findMenuBySlug(slug);
     if (isMenu) throw throwCustomError("Menu-Item Exist", 409);
-
     if (path) {
       const domain = `http://localhost:8080/uploads/${path}`;
       const res = await MenuItemRepo.picture({
@@ -55,9 +56,11 @@ export class MenuItemService {
     const response = await MenuItemRepo.createMenu({
       ...data,
       slug,
-      restaurantId: isRestaurant.id,
-      images: path,
+      restaurantId,
+      images: (data.images = path),
     });
+
+    console.log("response", response);
 
     if (!response) {
       throw throwCustomError("Menu not created", 500);
