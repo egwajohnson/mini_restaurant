@@ -51,7 +51,6 @@ export class RestaurantServices {
     if (error) throw throwCustomError(error.message, 422);
     //check if user is verified
     const user = await userModel.findById(userId);
-    // console.log(user);
     if (!user) throw throwCustomError("No record found", 500);
     if (!user.is_kyc_verified) throw throwCustomError("Complete your KYC", 422);
     //restauran model
@@ -59,8 +58,6 @@ export class RestaurantServices {
       path: "userId",
       model: "User",
     });
-
-    console.log(isRestaurant);
     //update
     const response = await restaurantModel.findByIdAndUpdate(
       isRestaurant?._id,
@@ -69,7 +66,6 @@ export class RestaurantServices {
         new: true,
       }
     );
-    console.log(response);
     if (!response) throw throwCustomError("unable to save changes", 500);
     return "All Changes Saved";
   };
