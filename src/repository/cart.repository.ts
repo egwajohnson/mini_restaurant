@@ -5,7 +5,12 @@ import {Cart} from "../interface/menuItem.interface";
 export class CartRepositories {
     
   static createcart = async(data:Cart,userId: Types.ObjectId)=>{
-    const response = await cartModel.create({data,userId});
+    const response = await cartModel.create({...data,userId});
+    return response;
+  }
+
+  static getcartByUserId = async(userId: Types.ObjectId)=>{
+    const response = await cartModel.findOne({userId});
     return response;
   }
 

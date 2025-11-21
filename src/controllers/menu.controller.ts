@@ -7,7 +7,7 @@ export class MenuController {
   static createMenu = asyncWrapper(async (req: IRequest, res: Response) => {
     const restaurantId = req.user.id;
     const data = req.body;
-    const path = req.file?.originalname;
+    const path = req.file?.filename;
     if (!path) return null;
     const response = await MenuItemService.createMenu(data, restaurantId, path);
     res.status(200).json({ success: true, payload: response });
