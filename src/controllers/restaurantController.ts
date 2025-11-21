@@ -24,4 +24,9 @@ export class RestaurantController {
       res.status(201).json({ Success: true, payload: response });
     }
   );
+  static flagRestaurant = asyncWrapper(async (req: IRequest, res: Response) => {
+    const email = req.body;
+    const response = await RestaurantServices.flagRestaurant(email);
+    res.status(201).json({ success: true, payload: response });
+  });
 }

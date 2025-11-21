@@ -1,5 +1,6 @@
 import { IMenuItem } from "../interface/menuItem.interface";
 import { IUpload } from "../interface/upload.interface";
+import { throwCustomError } from "../middleware/errorHandler";
 import { menuItemModel } from "../models/menu.item.model";
 import { uploadModel } from "../models/upload.model";
 

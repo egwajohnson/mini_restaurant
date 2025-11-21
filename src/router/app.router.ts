@@ -4,7 +4,6 @@ import { MenuController } from "../controllers/menu.controller";
 // import { AuthContoller } from "../controllers/auth.controller";
 import { AuthControllers } from "../controllers/auths.controller";
 import {
-  adminMiddleware,
   authMiddleware,
   restaurantMiddleware,
 } from "../middleware/authMiddleware";
@@ -72,12 +71,18 @@ router.patch(
   restaurantMiddleware as any,
   RestaurantController.updateRestaurant
 );
+router.patch(
+  "/restauarant/flagged",
+  adminAuthMiddleware as any,
+  RestaurantController.flagRestaurant
+);
+// *****************************||MENU MANAGT... ||********************************//
 //Menu Items
 router.post(
   "/menu",
   authMiddleware as any,
   restaurantMiddleware as any,
-  upload.single("image") as any,
+  upload.single("file") as any,
   MenuController.createMenu
 );
 
