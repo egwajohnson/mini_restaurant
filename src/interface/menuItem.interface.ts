@@ -11,3 +11,8 @@ export interface IMenuItem {
   images?: string;
   restaurantId: Types.ObjectId;
 }
+
+export interface Cart {
+  productId: string;
+  quantity: number;
+}
