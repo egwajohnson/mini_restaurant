@@ -8,3 +8,8 @@ export const menuItem = Joi.object({
   category: Joi.string().min(2).required(),
   isOpen: Joi.boolean().optional(),
 });
+
+export const cartItem = Joi.object({
+  productId: Joi.string().required(),
+  quantity: Joi.number().min(1).required(),
+}); 

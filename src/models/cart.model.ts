@@ -13,7 +13,7 @@ const cartItemSchema = new Schema({
 const cartSchema = new Schema( 
   {
     ownerId: { type: Schema.Types.ObjectId, ref: "User", require: true },
-    items: [cartItemSchema], 
+    items: [], 
     couponCode: { type: String },
     totalPrice: { type: Number, require: true },
   },

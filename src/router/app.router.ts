@@ -91,5 +91,12 @@ router.post(
   cartControllers.createcart as any
 );
 
+//update cart
+router.patch(
+  "/cart",
+  authMiddleware as any,
+  cartControllers.updateCart as any
+);
+
 
 export default router;
