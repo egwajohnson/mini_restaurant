@@ -14,6 +14,7 @@ import {
 } from "../middleware/adminAuthMiddleware";
 import { upload } from "../config/multer.config";
 import { RestaurantController } from "../controllers/restaurantController";
+import { uploadMiddleware } from "../middleware/uploadMiddleware";
 
 const router = express.Router();
 
@@ -60,7 +61,6 @@ router.post("/auth/update/user", AuthControllers.updateUser);
 router.post("/auth/reset-password", AuthControllers.resetpassword);
 router.post("/auth/request-new-otp", AuthControllers.requestNewOtp as any);
 
-
 // ***********************|| RESTAURANT MANAGT. ||********************************//
 router.post(
   "/restaurant/verify-kyc",
@@ -86,15 +86,11 @@ router.post(
   authMiddleware as any,
   restaurantMiddleware as any,
   upload.single("file") as any,
+  uploadMiddleware as any,
   MenuController.createMenu
 );
 
 //create cart
-router.post(
-  "/cart",
-  authMiddleware as any,
-  cartControllers.createcart as any
-);
-
+router.post("/cart", authMiddleware as any, cartControllers.createcart as any);
 
 export default router;

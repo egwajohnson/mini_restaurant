@@ -18,7 +18,7 @@ export class MenuItemService {
     if (error) {
       throw throwCustomError(error.message, 422);
     }
-
+    // if (path?.length === 0) throw throwCustomError("image is reqyuired", 422);
     const isRestaurant = await restaurantModel
       .findOne({ userId: restaurantId })
       .populate({
@@ -49,6 +49,8 @@ export class MenuItemService {
         restaurantId: isRestaurant.id,
         filePath: domain,
       });
+    } else {
+      throw throwCustomError("Please Upload a file", 422);
     }
 
     //create new Menu
