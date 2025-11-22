@@ -11,3 +11,8 @@ export const menuItem = Joi.object({
 export const slugValidate = Joi.object({
   slug: Joi.string().required(),
 });
+
+export const cartItem = Joi.object({
+  productId: Joi.string().required(),
+  quantity: Joi.number().min(1).required(),
+});

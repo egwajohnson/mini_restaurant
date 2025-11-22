@@ -106,6 +106,18 @@ router.post(
 // );
 
 //create cart
-router.post("/cart", authMiddleware as any, cartControllers.createcart as any);
+router.post(
+  "/cart",
+  authMiddleware as any,
+  cartControllers.createcart as any
+);
+
+//update cart
+router.patch(
+  "/cart",
+  authMiddleware as any,
+  cartControllers.updateCart as any
+);
+
 
 export default router;

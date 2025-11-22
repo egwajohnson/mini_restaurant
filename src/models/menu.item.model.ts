@@ -16,3 +16,23 @@ const menuItemSchema = new Schema(
 );
 
 export const menuItemModel = mongoose.model("Menu_Item", menuItemSchema);
+
+
+
+export const productSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    merchantId: { type: Types.ObjectId, ref: "Merchant" },
+    slug: { type: String, required: true, unique: true, index: true },
+    description: { type: String, required: false },
+    price: { type: Number, required: true },
+    discountPrice: { type: Number, required: false },
+    quantity: { type: Number, required: true },
+    sku: { type: String },
+    images: [{ type: String }],
+    isActive: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+);
+
+export const productModel = mongoose.model("Product", productSchema);
