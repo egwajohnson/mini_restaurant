@@ -12,5 +12,9 @@ export class MenuController {
     const response = await MenuItemService.createMenu(data, restaurantId, path);
     res.status(200).json({ success: true, payload: response });
   });
-  static deletMenu = asyncWrapper(async () => {});
+  static deleteMenu = asyncWrapper(async (req: IRequest, res: Response) => {
+    const slug = req.body;
+    const response = await MenuItemService.deleteMenu(slug);
+    res.status(201).json({ success: true, payload: response });
+  });
 }

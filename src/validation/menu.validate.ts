@@ -8,3 +8,6 @@ export const menuItem = Joi.object({
   category: Joi.string().min(2).required(),
   isOpen: Joi.boolean().optional(),
 });
+export const slugValidate = Joi.object({
+  slug: Joi.string().required(),
+});
