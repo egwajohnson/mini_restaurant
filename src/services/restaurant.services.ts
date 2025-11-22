@@ -14,10 +14,21 @@ export class RestaurantServices {
     const user = await userModel.findById(userId);
     if (!user) throw throwCustomError("Invalid account", 500);
 
+    //check if restaurant is flagged
+    const isRestaurant = await restaurantModel.findOne({ userId }).populate({
+      path: "userId",
+      model: "User",
+    });
+    if (isRestaurant?.adminStatus === "flagged") {
+      throw throwCustomError(
+        "Your account has been flagged. kindly reach out to the admin",
+        400
+      );
+    }
+
     //check if user is already verified
     if (user.is_kyc_verified)
       throw throwCustomError("Kyc already verified", 400);
-
     //call external api
     const isUser = kycRecords.find((item) => {
       return (
@@ -35,15 +46,28 @@ export class RestaurantServices {
         result.lastName.toLowerCase() === user.lastName?.toLowerCase()
       );
     });
-    console.log(isBvn);
+
     if (!isBvn) throw throwCustomError("Invalid BVN", 422);
     //verify kyc
     const res = await userModel.findByIdAndUpdate(
       userId,
-      { bvn, is_kyc_verified: true },
+      { is_kyc_verified: true },
       { new: true }
     );
     if (!res) throw throwCustomError("Unable to verify Kyc", 500);
+    const restaurant = await restaurantModel.findOne({ userId }).populate({
+      path: "userId",
+      model: "User",
+    });
+    const verify = await restaurantModel.findByIdAndUpdate(
+      restaurant?.id,
+      {
+        bvn: bvn,
+        adminStatus: "verified",
+      },
+      { new: true }
+    );
+    if (!verify) throw throwCustomError("Unable to verify Restaurant", 400);
     return `Your ${res.role} has been verified`;
   };
   static updateRestaurant = async (userId: Types.ObjectId, update: any) => {
@@ -58,6 +82,13 @@ export class RestaurantServices {
       path: "userId",
       model: "User",
     });
+    //check adminstaus on restaurant
+    if (isRestaurant?.adminStatus === "flagged") {
+      throw throwCustomError(
+        "Your account has been flagged, kindly reach out to an admin",
+        400
+      );
+    }
     //update
     const response = await restaurantModel.findByIdAndUpdate(
       isRestaurant?._id,
@@ -68,5 +99,19 @@ export class RestaurantServices {
     );
     if (!response) throw throwCustomError("unable to save changes", 500);
     return "All Changes Saved";
+  };
+  static flagRestaurant = async (email: string) => {
+    const user = await restaurantModel.findOne({ email }).populate({
+      path: "userId",
+      model: "User",
+    });
+    const flaggedRestaurant = await restaurantModel.findOneAndUpdate(
+      { email: user?.email },
+      { adminStatus: "flagged" },
+      { new: true }
+    );
+    if (!flaggedRestaurant)
+      throw throwCustomError("Unable to Flag account", 400);
+    return "Restaurant is Flagged";
   };
 }

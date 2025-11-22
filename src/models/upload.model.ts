@@ -4,10 +4,6 @@ const uploadSchema = new mongoose.Schema({
   restaurantId: {
     type: Types.ObjectId,
     require: true,
-    unique: true,
-    partialFilterExpression: {
-      restaurantId: { $exist: true, $ne: null },
-    },
     ref: "Restaurant",
   },
   filePath: {

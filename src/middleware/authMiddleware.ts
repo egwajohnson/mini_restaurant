@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { jwt_secret } from "../config/system.variable";
 import { userModel } from "../models/user.model";
 import { adminModel } from "../models/admin.model";
+import { restaurantModel } from "../models/restaurant.model";
 
 export interface IRequest extends Request {
   user: {
@@ -37,24 +38,9 @@ export const authMiddleware = (
       role: user.role as string,
     };
     next();
-    const admin = await adminModel.findById(new Types.ObjectId(data.adminId));
   });
 };
 
-export const adminMiddleware = (
-  req: IRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const user = req.user;
-  if (!user) return res.sendStatus(403);
-  if (user.role !== "admin") {
-    return res
-      .sendStatus(403)
-      .json({ payload: "You are not authorized to access this resources" });
-  }
-  next();
-};
 export const customerMiddleware = (
   req: IRequest,
   res: Response,
@@ -76,14 +62,13 @@ export const restaurantMiddleware = (
   next: NextFunction
 ) => {
   const user = req.user;
+
   if (!user) return res.sendStatus(403);
   if (user.role !== "restaurant") {
-    return res
-      .status(403)
-      .json({
-        success: false,
-        payload: "You are not authorized to access this resources",
-      });
+    return res.status(403).json({
+      success: false,
+      payload: "You are not authorized to access this resources",
+    });
   }
   next();
 };

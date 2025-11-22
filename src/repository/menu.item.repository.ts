@@ -1,6 +1,7 @@
 import { IMenuItem } from "../interface/menuItem.interface";
 import { Types } from "mongoose";
 import { IUpload } from "../interface/upload.interface";
+import { throwCustomError } from "../middleware/errorHandler";
 import { menuItemModel } from "../models/menu.item.model";
 import { uploadModel } from "../models/upload.model";
 
@@ -11,8 +12,8 @@ export class MenuItemRepo {
     return response;
   };
 
-  static findMenuBySlug = async (slug: string, restaurantId: Types.ObjectId) => {
-    const response = await menuItemModel.findOne({ slug, restaurantId }).lean();
+  static findMenuBySlug = async (slug: string) => {
+    const response = await menuItemModel.findOne({ slug }).lean();
     if (!response) return null;
     return response;
   };

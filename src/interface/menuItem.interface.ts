@@ -9,7 +9,7 @@ export interface IMenuItem {
   category: string;
   isOpen?: boolean;
   images?: string;
-  restaurantId: Types.ObjectId;
+  restaurantId?: Types.ObjectId;
 }
 
 export interface Cart {

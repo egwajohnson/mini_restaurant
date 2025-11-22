@@ -5,7 +5,6 @@ import { MenuController } from "../controllers/menu.controller";
 import { AuthControllers } from "../controllers/auths.controller";
 import { cartControllers } from "../controllers/cart.controller";
 import {
-  adminMiddleware,
   authMiddleware,
   restaurantMiddleware,
 } from "../middleware/authMiddleware";
@@ -15,6 +14,7 @@ import {
 } from "../middleware/adminAuthMiddleware";
 import { upload } from "../config/multer.config";
 import { RestaurantController } from "../controllers/restaurantController";
+import { uploadMiddleware } from "../middleware/uploadMiddleware";
 
 const router = express.Router();
 
@@ -61,7 +61,6 @@ router.post("/auth/update/user", AuthControllers.updateUser);
 router.post("/auth/reset-password", AuthControllers.resetpassword);
 router.post("/auth/request-new-otp", AuthControllers.requestNewOtp as any);
 
-
 // ***********************|| RESTAURANT MANAGT. ||********************************//
 router.post(
   "/restaurant/verify-kyc",
@@ -75,12 +74,19 @@ router.patch(
   restaurantMiddleware as any,
   RestaurantController.updateRestaurant
 );
+router.patch(
+  "/restauarant/flagged",
+  adminAuthMiddleware as any,
+  RestaurantController.flagRestaurant
+);
+// *****************************||MENU MANAGT... ||********************************//
 //Menu Items
 router.post(
   "/menu",
   authMiddleware as any,
   restaurantMiddleware as any,
-  upload.single("image") as any,
+  upload.single("file") as any,
+  uploadMiddleware as any,
   MenuController.createMenu
 );
 

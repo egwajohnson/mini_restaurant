@@ -5,6 +5,8 @@ import { throwCustomError } from "../middleware/errorHandler";
 import { MenuItemRepo } from "../repository/menu.item.repository";
 import { any } from "joi";
 import { restaurantModel } from "../models/restaurant.model";
+import { menuItemModel } from "../models/menu.item.model";
+import { uploadModel } from "../models/upload.model";
 
 export class MenuItemService {
   static createMenu = async (
@@ -16,33 +18,48 @@ export class MenuItemService {
     if (error) {
       throw throwCustomError(error.message, 422);
     }
-
+    // if (path?.length === 0) throw throwCustomError("image is reqyuired", 422);
+    const isRestaurant = await restaurantModel
+      .findOne({ userId: restaurantId })
+      .populate({
+        path: "userId",
+        model: "User",
+      });
+    if (!isRestaurant) throw throwCustomError("No Resaturant found", 400);
+    if (
+      isRestaurant?.adminStatus === "restricted" ||
+      isRestaurant?.adminStatus === "flagged"
+    ) {
+      throw throwCustomError(
+        "You are not authorized to create a Menu. Kindly reach out to the admin",
+        400
+      );
+    }
     if (data.price <= 0)
       throw throwCustomError("Price should be greater than 0 ", 400);
 
     const slug = data.name.toLowerCase().trim().replace(/\s+/g, "-");
-    console.log("slug", slug);
-    const restaurant = await restaurantModel.findById(data.restaurantId);
+    const restaurant = await restaurantModel.findOne(data.restaurantId);
     //check menu existence
-    const isMenu = await MenuItemRepo.findMenuBySlug(slug, restaurantId);
-    if (isMenu) throw throwCustomError("Menu-Item already exist", 409);
+    const isMenu = await MenuItemRepo.findMenuBySlug(slug);
+    if (isMenu) throw throwCustomError("Menu-Item Exist", 409);
     if (path) {
       const domain = `http://localhost:8080/uploads/${path}`;
       const res = await MenuItemRepo.picture({
-        restaurantId: restaurantId._id,
+        restaurantId: isRestaurant.id,
         filePath: domain,
       });
-      if (!res) throw throwCustomError("Unable to upload images", 400);
+    } else {
+      throw throwCustomError("Please Upload a file", 422);
     }
+
     //create new Menu
     const response = await MenuItemRepo.createMenu({
       ...data,
       slug,
       restaurantId,
-      images: path ? (data.images = path) : undefined,
+      images: (data.images = path),
     });
-
-    console.log("response", response);
 
     if (!response) {
       throw throwCustomError("Menu not created", 500);

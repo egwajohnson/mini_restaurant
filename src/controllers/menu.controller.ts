@@ -12,4 +12,5 @@ export class MenuController {
     const response = await MenuItemService.createMenu(data, restaurantId, path);
     res.status(200).json({ success: true, payload: response });
   });
+  static deletMenu = asyncWrapper(async () => {});
 }
