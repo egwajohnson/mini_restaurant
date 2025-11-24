@@ -5,10 +5,15 @@ import { PORT } from "./config/system.variable";
 import router from "./router/app.router";
 import { handleCustomError } from "./middleware/errorHandler";
 import { mongoConnection } from "./config/db.connection";
+import {limiter} from "./utils/rate-limits"
 import path from "path";
 
 const app = express();
 app.use(express.json());
+
+// Apply rate limiting middleware
+app.use(limiter);
+
 app.use("/api/v1", router);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
