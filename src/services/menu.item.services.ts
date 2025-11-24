@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import { IMenuItem } from "../interface/menuItem.interface";
-import { menuItem } from "../validation/menu.validate";
+import { menuItem, slugValidate } from "../validation/menu.validate";
 import { throwCustomError } from "../middleware/errorHandler";
 import { MenuItemRepo } from "../repository/menu.item.repository";
 import { any } from "joi";
@@ -18,7 +18,6 @@ export class MenuItemService {
     if (error) {
       throw throwCustomError(error.message, 422);
     }
-    // if (path?.length === 0) throw throwCustomError("image is reqyuired", 422);
     const isRestaurant = await restaurantModel
       .findOne({ userId: restaurantId })
       .populate({
@@ -52,7 +51,6 @@ export class MenuItemService {
     } else {
       throw throwCustomError("Please Upload a file", 422);
     }
-
     //create new Menu
     const response = await MenuItemRepo.createMenu({
       ...data,
@@ -60,11 +58,38 @@ export class MenuItemService {
       restaurantId,
       images: (data.images = path),
     });
-
     if (!response) {
       throw throwCustomError("Menu not created", 500);
     }
 
     return "New Menu Added";
+  };
+  static deleteMenu = async (restaurantId: Types.ObjectId, slug: string) => {
+    const { error } = slugValidate.validate(slug);
+    if (error) throw throwCustomError(error.message, 400);
+    // const findSLug = await MenuItemRepo.findMenuBySlug(slug);
+    const isRestaurant = await restaurantModel
+      .findOne({ userId: restaurantId })
+      .populate({
+        path: "userId",
+        model: "User",
+      });
+    console.log(isRestaurant);
+    if (!isRestaurant) throw throwCustomError("No Resaturant found", 400);
+    const slugExist = await menuItemModel
+      .findOne({ restaurantId: isRestaurant })
+      .populate({
+        path: "restaurantId",
+        model: "Restaurant",
+      });
+    console.log(slugExist);
+    if (!slugExist) {
+      throw throwCustomError("No slug found", 500);
+    }
+    const isSlug = await menuItemModel.findOneAndDelete({
+      slug: slugExist.id,
+    });
+    if (!isSlug) throw throwCustomError("No Slug found", 400);
+    return "Menu has been Deleted";
   };
 }

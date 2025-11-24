@@ -114,4 +114,23 @@ export class RestaurantServices {
       throw throwCustomError("Unable to Flag account", 400);
     return "Restaurant is Flagged";
   };
+  static toggleRestaurantStatus = async (restaurantId: Types.ObjectId) => {
+    const isRestaurant = await restaurantModel.findOne(restaurantId).populate({
+      path: "userId",
+      model: "User",
+    });
+
+    const update = await restaurantModel.findOneAndUpdate(
+      isRestaurant?.id,
+      [
+        {
+          $set: {
+            status: { $cond: [{ $eq: ["$status", "Open"] }, "Closed", "Open"] },
+          },
+        },
+      ],
+      { new: true }
+    );
+    return `Your Restaurant is ${update?.status}`;
+  };
 }

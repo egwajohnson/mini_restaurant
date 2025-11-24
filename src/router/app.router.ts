@@ -77,8 +77,16 @@ router.patch(
 router.patch(
   "/restauarant/flagged",
   adminAuthMiddleware as any,
+  adminAuthMiddleware as any,
   RestaurantController.flagRestaurant
 );
+router.patch(
+  "/restaurant/toggle-status/:restaurantId",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  RestaurantController.toggleRestaurant
+);
+
 // *****************************||MENU MANAGT... ||********************************//
 //Menu Items
 router.post(
@@ -89,6 +97,13 @@ router.post(
   uploadMiddleware as any,
   MenuController.createMenu
 );
+
+// router.delete(
+//   "/menu/delete",
+//   authMiddleware as any,
+//   restaurantMiddleware as any,
+//   MenuController.deleteMenu
+// );
 
 //create cart
 router.post(

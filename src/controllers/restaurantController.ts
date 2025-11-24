@@ -2,6 +2,7 @@ import { Response } from "express";
 import { asyncWrapper } from "../middleware/asyncWrapper";
 import { IRequest } from "../middleware/authMiddleware";
 import { RestaurantServices } from "../services/restaurant.services";
+import { Types } from "mongoose";
 
 export class RestaurantController {
   static kyc = asyncWrapper(async (req: IRequest, res: Response) => {
@@ -29,4 +30,13 @@ export class RestaurantController {
     const response = await RestaurantServices.flagRestaurant(email);
     res.status(201).json({ success: true, payload: response });
   });
+  static toggleRestaurant = asyncWrapper(
+    async (req: IRequest, res: Response) => {
+      const restaurantId = req.params.restaurantId;
+      const response = await RestaurantServices.toggleRestaurantStatus(
+        new Types.ObjectId(restaurantId)
+      );
+      res.status(201).json({ success: true, payload: response });
+    }
+  );
 }

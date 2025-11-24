@@ -23,7 +23,7 @@ const restaurantSchema = new Schema(
     },
     bvn: { type: String },
     payout: { type: Object, method: ["BANK", "WALLET"] },
-    status: { type: String, enum: ["open", "closed"], default: "closed" },
+    status: { type: String, enum: ["Open", "Closed"], default: "Closed" },
     adminStatus: {
       type: String,
       enum: ["restricted", "flagged", "verified"],
