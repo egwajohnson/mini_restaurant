@@ -3,7 +3,6 @@ import { IMenuItem } from "../interface/menuItem.interface";
 import { menuItem, slugValidate } from "../validation/menu.validate";
 import { throwCustomError } from "../middleware/errorHandler";
 import { MenuItemRepo } from "../repository/menu.item.repository";
-import { any } from "joi";
 import { restaurantModel } from "../models/restaurant.model";
 import { menuItemModel } from "../models/menu.item.model";
 import { uploadModel } from "../models/upload.model";
@@ -13,7 +12,7 @@ export class MenuItemService {
     data: IMenuItem,
     restaurantId: Types.ObjectId,
     path: any
-  ) => {
+  ) => { 
     const { error } = menuItem.validate(data);
     if (error) {
       throw throwCustomError(error.message, 422);
@@ -43,7 +42,7 @@ export class MenuItemService {
     const isMenu = await MenuItemRepo.findMenuBySlug(slug);
     if (isMenu) throw throwCustomError("Menu-Item Exist", 409);
     if (path) {
-      const domain = `http://localhost:8080/uploads/${path}`;
+      const domain = `http://localhost:3000/uploads/${path}`;
       const res = await MenuItemRepo.picture({
         restaurantId: isRestaurant.id,
         filePath: domain,
