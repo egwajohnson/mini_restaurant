@@ -98,26 +98,17 @@ router.post(
   MenuController.createMenu
 );
 
-// router.delete(
-//   "/menu/delete",
-//   authMiddleware as any,
-//   restaurantMiddleware as any,
-//   MenuController.deleteMenu
-// );
+router.delete(
+  "/menu/delete",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  MenuController.deleteMenu
+);
 
 //create cart
-router.post(
-  "/cart",
-  authMiddleware as any,
-  cartControllers.createcart as any
-);
+router.post("/cart", authMiddleware as any, cartControllers.createcart as any);
 
 //update cart
-router.patch(
-  "/cart",
-  authMiddleware as any,
-  cartControllers.updateCart as any
-);
-
+router.patch("/cart", authMiddleware as any, cartControllers.updateCart as any);
 
 export default router;

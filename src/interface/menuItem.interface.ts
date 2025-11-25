@@ -10,6 +10,7 @@ export interface IMenuItem {
   isOpen?: boolean;
   images?: string;
   restaurantId?: Types.ObjectId;
+  menuId?: Types.ObjectId;
 }
 
 export interface Cart {
