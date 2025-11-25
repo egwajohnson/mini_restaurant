@@ -76,8 +76,8 @@ router.patch(
 );
 router.patch(
   "/restauarant/flagged",
-  adminAuthMiddleware as any,
-  adminAuthMiddleware as any,
+  //adminAuthMiddleware as any,
+  //adminAuthMiddleware as any,
   RestaurantController.flagRestaurant
 );
 router.patch(
@@ -93,7 +93,7 @@ router.post(
   "/menu",
   authMiddleware as any,
   restaurantMiddleware as any,
-  upload.single("file") as any,
+  upload.single("images") as any,
   uploadMiddleware as any,
   MenuController.createMenu
 );
@@ -106,9 +106,9 @@ router.delete(
 );
 
 //create cart
-router.post("/cart", authMiddleware as any, cartControllers.createcart as any);
-
+router.post("/cart/create", authMiddleware as any, cartControllers.createcart as any);
 //update cart
-router.patch("/cart", authMiddleware as any, cartControllers.updateCart as any);
-
+router.patch("/cart/update", authMiddleware as any, cartControllers.updateCart as any);
+//get cart
+router.get("/cart/get/:ownerId", authMiddleware as any, cartControllers.getCart as any);
 export default router;

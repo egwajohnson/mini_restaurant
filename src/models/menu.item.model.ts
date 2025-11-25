@@ -1,3 +1,4 @@
+import { required } from "joi";
 import mongoose, { Schema, Types } from "mongoose";
 
 const menuItemSchema = new Schema(
@@ -7,7 +8,8 @@ const menuItemSchema = new Schema(
     slug: { type: String, require: false },
     description: { type: String, require: true },
     price: { type: Number, require: true },
-    discountedPrice: { type: Number, require: false },
+    discountedPrice: { type: Number, required: false },
+    quantity: { type: Number, required: true },
     category: { type: String, require: true },
     isOpen: { type: Boolean, default: true },
     images: [{}],
@@ -19,20 +21,4 @@ export const menuItemModel = mongoose.model("Menu_Item", menuItemSchema);
 
 
 
-export const productSchema = new Schema(
-  {
-    name: { type: String, required: true },
-    merchantId: { type: Types.ObjectId, ref: "Merchant" },
-    slug: { type: String, required: true, unique: true, index: true },
-    description: { type: String, required: false },
-    price: { type: Number, required: true },
-    discountPrice: { type: Number, required: false },
-    quantity: { type: Number, required: true },
-    sku: { type: String },
-    images: [{ type: String }],
-    isActive: { type: Boolean, default: true },
-  },
-  { timestamps: true }
-);
 
-export const productModel = mongoose.model("Product", productSchema);

@@ -13,7 +13,7 @@ export class MenuItemService {
     data: IMenuItem,
     restaurantId: Types.ObjectId,
     path: any
-  ) => { 
+  ) => {
     const { error } = menuItem.validate(data);
     if (error) {
       throw throwCustomError(error.message, 422);
@@ -47,7 +47,7 @@ export class MenuItemService {
       ...data,
       slug,
       restaurantId: isRestaurant._id,
-      images: (data.images = path),
+      images: path,
     });
     if (!response) {
       throw throwCustomError("Menu not created", 500);
@@ -55,10 +55,12 @@ export class MenuItemService {
     if (path) {
       const menuExist = await menuItemModel.findOne({ slug }).lean().populate({
         path: "restaurantId",
-        model: "Restaurant",
-      });
+        //model: "Restaurant",
+      }).exec();
       console.log("menu exist", menuExist);
-      const domain = `http://localhost:8080/uploads/${path}`;
+
+      const domain = `http://localhost:3000/uploads/${path}`;
+
       const res = await MenuItemRepo.picture({
         restaurantId: isRestaurant._id,
         menuId: menuExist?._id,
