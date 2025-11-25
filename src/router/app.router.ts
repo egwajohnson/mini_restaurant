@@ -111,4 +111,9 @@ router.post("/cart/create", authMiddleware as any, cartControllers.createcart as
 router.patch("/cart/update", authMiddleware as any, cartControllers.updateCart as any);
 //get cart
 router.get("/cart/get/:ownerId", authMiddleware as any, cartControllers.getCart as any);
+
+//create order
+router.post("/order/create", authMiddleware as any, cartControllers.createOrder as any);
+router.get("/order/get/:orderId", authMiddleware as any, cartControllers.getOrder as any);
+router.patch("/order/update/:orderId", authMiddleware as any, cartControllers.updateOrder as any);
 export default router;

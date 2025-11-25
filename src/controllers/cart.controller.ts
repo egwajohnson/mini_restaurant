@@ -23,6 +23,41 @@ export class cartControllers{
     const cart = await CartServices.getCarts(ownerId);
     res.status(200).json(cart);
   });
+
+  // create order 
+  static createOrder = asyncWrapper(async (req: IRequest, res: Response) => {
+    const { cartId, street, city, state } = req.body;
+    const userId = req.user.id;
+    const order = await CartServices.createorder(cartId, userId, { street, city, state });
+    res.status(201).json(order);
+  });
+
+  static getOrder = asyncWrapper(async(req:IRequest, res:Response) => {
+    const {orderId} = req.params;
+    const order = await CartServices.getOrder(orderId as any);
+    res.status(201).json({order});
+
+  })
+
+  static updateOrder = asyncWrapper(async (req: Request, res: Response) => {
+    try {
+      const orderId = req.params.orderId;
+      const {menuitemId, quantity} = req.body;
+      console.log("Order ID:", orderId);
+
+      const updatedOrder = await CartServices.updateOrder(orderId as any, menuitemId, quantity);
+       if (!updatedOrder) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      console.log("Updated Order:", updatedOrder);
+      res.status(200).json({
+        message: "Order updated successfully",
+        data: updatedOrder,
+      });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
      
 
 }
