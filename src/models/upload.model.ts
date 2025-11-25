@@ -1,6 +1,11 @@
 import mongoose, { Types } from "mongoose";
 
 const uploadSchema = new mongoose.Schema({
+  menuId: {
+    type: Types.ObjectId,
+    require: true,
+    ref: "Menu_Item",
+  },
   restaurantId: {
     type: Types.ObjectId,
     require: true,

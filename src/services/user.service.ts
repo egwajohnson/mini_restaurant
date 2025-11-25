@@ -62,7 +62,7 @@ export class UserServices {
       }
     }
     if (response.role === "restaurant") {
-      const restaurant = await RestaurantRepo.createrRestaurant(response._id);
+      const restaurant = await RestaurantRepo.createRestaurant(response._id);
       if (!restaurant) {
         throw throwCustomError("Unable to create a Restaurant account", 500);
       }

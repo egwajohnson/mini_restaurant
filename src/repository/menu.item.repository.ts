@@ -23,6 +23,7 @@ export class MenuItemRepo {
   static picture = async (upload: IUpload): Promise<any> => {
     const response = await uploadModel.create({
       restaurantId: upload.restaurantId,
+      menuId: upload.menuId,
       filePath: upload.filePath,
     });
     if (!response) return null;

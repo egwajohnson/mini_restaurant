@@ -7,6 +7,7 @@ import { any } from "joi";
 import { restaurantModel } from "../models/restaurant.model";
 import { menuItemModel } from "../models/menu.item.model";
 import { uploadModel } from "../models/upload.model";
+import path from "path";
 
 export class MenuItemService {
   static createMenu = async (
@@ -38,58 +39,63 @@ export class MenuItemService {
       throw throwCustomError("Price should be greater than 0 ", 400);
 
     const slug = data.name.toLowerCase().trim().replace(/\s+/g, "-");
-    const restaurant = await restaurantModel.findOne(data.restaurantId);
+
     //check menu existence
     const isMenu = await MenuItemRepo.findMenuBySlug(slug);
     if (isMenu) throw throwCustomError("Menu-Item Exist", 409);
-    if (path) {
-      const domain = `http://localhost:8080/uploads/${path}`;
-      const res = await MenuItemRepo.picture({
-        restaurantId: isRestaurant.id,
-        filePath: domain,
-      });
-    } else {
-      throw throwCustomError("Please Upload a file", 422);
-    }
+
     //create new Menu
     const response = await MenuItemRepo.createMenu({
       ...data,
       slug,
-      restaurantId,
+      restaurantId: isRestaurant._id,
       images: (data.images = path),
     });
     if (!response) {
       throw throwCustomError("Menu not created", 500);
     }
-
-    return "New Menu Added";
-  };
-  static deleteMenu = async (restaurantId: Types.ObjectId, slug: string) => {
-    const { error } = slugValidate.validate(slug);
-    if (error) throw throwCustomError(error.message, 400);
-    // const findSLug = await MenuItemRepo.findMenuBySlug(slug);
-    const isRestaurant = await restaurantModel
-      .findOne({ userId: restaurantId })
-      .populate({
-        path: "userId",
-        model: "User",
-      });
-    console.log(isRestaurant);
-    if (!isRestaurant) throw throwCustomError("No Resaturant found", 400);
-    const slugExist = await menuItemModel
-      .findOne({ restaurantId: isRestaurant })
-      .populate({
+    if (path) {
+      const menuExist = await menuItemModel.findOne({ slug }).lean().populate({
         path: "restaurantId",
         model: "Restaurant",
       });
-    console.log(slugExist);
-    if (!slugExist) {
-      throw throwCustomError("No slug found", 500);
+      console.log("menu exist", menuExist);
+      const domain = `http://localhost:8080/uploads/${path}`;
+      const res = await MenuItemRepo.picture({
+        restaurantId: isRestaurant._id,
+        menuId: menuExist?._id,
+        filePath: domain,
+      });
     }
-    const isSlug = await menuItemModel.findOneAndDelete({
-      slug: slugExist.id,
-    });
-    if (!isSlug) throw throwCustomError("No Slug found", 400);
+    return "New Menu Added";
+  };
+
+  static deleteMenu = async (slug: string) => {
+    const { error } = slugValidate.validate({ slug });
+    if (error) throw throwCustomError(error.message, 400);
+    const findSLug = await MenuItemRepo.findMenuBySlug(slug);
+    if (!findSLug) throw throwCustomError("No Slug Found", 400);
+
+    if (slug) {
+      const deleteImage = await uploadModel
+        .findOneAndDelete({ menuId: findSLug })
+        .populate({
+          path: "menuId",
+          model: "Menu_Item",
+        });
+      if (!deleteImage) throw throwCustomError("unable to delete image", 400);
+      const slugExist = await menuItemModel
+        .findOneAndDelete({ slug })
+        .lean()
+        .populate({
+          path: "restaurantId",
+          model: "Restaurant",
+        });
+      if (!slugExist) {
+        throw throwCustomError("No slug found", 500);
+      }
+      if (!slug) throw throwCustomError("Unable to delete Menu", 400);
+    }
     return "Menu has been Deleted";
   };
 }
