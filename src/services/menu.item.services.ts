@@ -1,6 +1,10 @@
 import { Types } from "mongoose";
 import { IMenuItem } from "../interface/menuItem.interface";
-import { menuItem, slugValidate } from "../validation/menu.validate";
+import {
+  editValidate,
+  menuItem,
+  slugValidate,
+} from "../validation/menu.validate";
 import { throwCustomError } from "../middleware/errorHandler";
 import { MenuItemRepo } from "../repository/menu.item.repository";
 import { any } from "joi";
@@ -70,12 +74,83 @@ export class MenuItemService {
     return "New Menu Added";
   };
 
-  static deleteMenu = async (slug: string) => {
+  static editMenu = async (
+    restaurantId: Types.ObjectId,
+    menuId: string,
+    update: any
+  ) => {
+    const { error } = editValidate.validate(update);
+    const isMenuExist = await menuItemModel.findById(menuId);
+    // console.log(isMenuExist);
+    if (error) throw throwCustomError(error.message, 400);
+    const restaurant = await restaurantModel
+      .findOne({ userId: restaurantId })
+      .populate({
+        path: "userId",
+        model: "User",
+      });
+    // console.log("restaurant id is", restaurant?._id);
+
+    const isMenu = await menuItemModel
+      .findOne({ slug: isMenuExist?.slug })
+      .lean()
+      .populate({
+        path: "restaurantId",
+        model: "Restaurant",
+      });
+    // console.log(restaurantId);
+    // console.log(menuId);
+    // console.log("isMenu restau id is", (isMenu?.restaurantId as any)._id);
+    if (!restaurant?._id.equals((isMenu?.restaurantId as any)._id)) {
+      throw throwCustomError("Invalid", 422);
+      // console.log(
+      //   "anser is",
+      //   !restaurant?._id.equals((isMenu?.restaurantId as any)._id)
+      // );
+    }
+    const slug = update?.name.toLowerCase().trim().replace(/\s+/g, "-");
+    if (update.price <= 0)
+      throw throwCustomError("Price should be greater than 0 ", 400);
+    // console.log(isMenu);
+
+    const response = await menuItemModel.findOneAndUpdate(
+      { _id: menuId },
+      { ...update, slug },
+      {
+        new: true,
+      }
+    );
+    // console.log(response);
+    if (!response) throw throwCustomError("Unable to save Changes", 400);
+    return "Changes Saved";
+  };
+
+  static viewMenu = async (restaurantId: Types.ObjectId) => {
+    const restaurant = await restaurantModel
+      .findOne({ userId: restaurantId })
+      .populate({
+        path: "userId",
+        model: "User",
+      });
+    const menu = await menuItemModel.find({ restaurantId: restaurant?._id });
+    if (!menu) throw throwCustomError("No Menu Available", 400);
+    return menu;
+  };
+
+  static deleteMenu = async (restaurantId: Types.ObjectId, slug: string) => {
     const { error } = slugValidate.validate({ slug });
     if (error) throw throwCustomError(error.message, 400);
+    const restaurant = await restaurantModel
+      .findOne({ userId: restaurantId })
+      .populate({
+        path: "userId",
+        model: "User",
+      });
     const findSLug = await MenuItemRepo.findMenuBySlug(slug);
     if (!findSLug) throw throwCustomError("No Slug Found", 400);
-
+    if (!restaurant?._id.equals((findSLug.restaurantId as any)._id)) {
+      throw throwCustomError("Unable to perform request", 422);
+    }
     if (slug) {
       const deleteImage = await uploadModel
         .findOneAndDelete({ menuId: findSLug })

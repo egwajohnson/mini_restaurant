@@ -12,7 +12,7 @@ export class MenuItemRepo {
     return response;
   };
 
-  static findMenuBySlug = async (slug: string) => {
+  static findMenuBySlug = async (slug: string): Promise<any> => {
     const response = await menuItemModel.findOne({ slug }).lean().populate({
       path: "restaurantId",
       model: "Restaurant",

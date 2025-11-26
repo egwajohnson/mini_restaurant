@@ -97,6 +97,18 @@ router.post(
   uploadMiddleware as any,
   MenuController.createMenu
 );
+router.patch(
+  "/menu/update",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  MenuController.editMenu
+);
+router.get(
+  "/menu/view-menu",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  MenuController.viewMenu
+);
 
 router.delete(
   "/menu/delete",
