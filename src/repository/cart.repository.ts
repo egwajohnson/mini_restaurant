@@ -33,12 +33,13 @@ export class CartRepositories {
 
   }
 
-   static async updateOrder(cartId: Types.ObjectId, menuitemId: Types.ObjectId, quantity: string ) {
+   static async updateOrder(orderId: Types.ObjectId, menuitemId: Types.ObjectId, quantity: number ) {
     const order = await orderModel.findOneAndUpdate(
-      { _id: cartId },
-      { $set: { "items.$[elem].quantity": quantity } },
-      { new: true, arrayFilters: [{ "elem.productId": menuitemId }] }
-    );
+      { _id: orderId },
+
+       { $set: { quantity: quantity } },
+       { new: true, arrayFilters: [{"menuitemId": menuitemId}] }
+    ).select('-__v');
     return order;
   }
 

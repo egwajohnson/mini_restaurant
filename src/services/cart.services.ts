@@ -5,7 +5,7 @@ import { throwCustomError } from "../middleware/errorHandler";
 import { cartItem } from "../validation/menu.validate";
 import { Cart } from "../interface/menuItem.interface";
 import { orderModel } from "../models/order.model";
-import {orderTemplate} from "../utils/order-template";
+import { orderTemplate } from "../utils/order-template";
 import { userModel } from "../models/user.model";
 
 export class CartServices {
@@ -64,7 +64,7 @@ export class CartServices {
       };
     } else {
       const idx = cart?.items.findIndex(
-        (item) => item.productId?.toString() === data.menuitemId.toString()
+        (item) => item.menuItemId?.toString() === data.menuitemId.toString()
       );
 
       if (idx > -1) {
@@ -124,13 +124,16 @@ export class CartServices {
       if (!cart) {
         throw throwCustomError("Cart not found", 404);
       }
-      const getorderId = await orderModel.findOne({cartId:cartId, userId:userId});
-      if(getorderId){
+      const getorderId = await orderModel.findOne({
+        cartId: cartId,
+        userId: userId,
+      });
+      if (getorderId) {
         throw throwCustomError("Order already exists for this cart", 409);
       }
       const orderId = `ORD-${Date.now()}`;
-      const order = await orderModel.create(
-       { cartId,
+      const order = await orderModel.create({
+        cartId,
         userId,
         shippingAddress,
         orderId,
@@ -138,8 +141,8 @@ export class CartServices {
         paymentMethod: "paystack",
         status: "draft",
         currency: "NGN",
-        totalPrice: cart.totalPrice,}
-      );
+        totalPrice: cart.totalPrice,
+      });
 
       if (!order) {
         throw throwCustomError("Order creation failed", 500);
@@ -149,46 +152,56 @@ export class CartServices {
 
       order.paymentRef = paymentRef;
       order.status = "pending";
-      await order.save(); 
-      
+      await order.save();
+
       return {
         success: true,
         message: "Order created successfully",
         data: order,
       };
     } catch (error: any) {
-      throw throwCustomError(error.message || "Order creation failed", error.statusCode || 500);
+      throw throwCustomError(
+        error.message || "Order creation failed",
+        error.statusCode || 500
+      );
     }
   };
 
   // Get Orders
-  static getOrder = async (orderId:Types.ObjectId)=> {
+  static getOrder = async (orderId: Types.ObjectId) => {
     if (!orderId) {
-    throw throwCustomError("Order ID is required", 400);
-  }
-      const order = await CartRepositories.getOrder(orderId)
-      if (!order) {
-        throw throwCustomError("Order not found", 404);
-      }
+      throw throwCustomError("Order ID is required", 400);
+    }
+    const order = await CartRepositories.getOrder(orderId);
+    if (!order) {
+      throw throwCustomError("Order not found", 404);
+    }
     return {
       success: true,
-      message:"Order retrieved successfully",
+      message: "Order retrieved successfully",
       data: order,
-    }
-  }
+    };
+  };
 
-  static async updateOrder(cartId: Types.ObjectId, menuitemId: Types.ObjectId,quantity: string) {
-     if (!cartId) {
-      throw new Error("Cart ID is required");
+  static async updateOrder(
+    orderId: Types.ObjectId,
+    menuitemId: Types.ObjectId,
+    quantity: number
+  ) {
+    if (!orderId) {
+      throw new Error("Order ID is required");
+    }
+    if (!menuitemId) throw new Error("Menu Item ID is required");
+    if (quantity == null || isNaN(quantity)) {
+      throw new Error("Quantity must be a valid number");
     }
 
-    const cart = await CartRepositories.updateOrder(
-      cartId,
+    const order = await CartRepositories.updateOrder(
+      orderId,
       menuitemId,
       quantity
     );
-    await cart?.save();
-    return cart;
+    await order?.save();
+    return order;
   }
-
 }
