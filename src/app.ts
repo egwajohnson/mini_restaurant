@@ -13,7 +13,6 @@ app.use(express.json());
 
 // Apply rate limiting middleware
 app.use(limiter);
-
 app.use("/api/v1", router);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

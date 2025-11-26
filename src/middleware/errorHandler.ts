@@ -26,6 +26,7 @@ export const handleCustomError = (
       timeStamp: new Date(),
     });
   } else {
+     console.log("🔥 INTERNAL ERROR:", error);
     res.status(500).json({
       success: false,
       payload: "Something went wrong",

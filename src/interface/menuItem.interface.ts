@@ -14,6 +14,6 @@ export interface IMenuItem {
 }
 
 export interface Cart {
-  productId: string;
+  menuitemId: string;
   quantity: number;
 }

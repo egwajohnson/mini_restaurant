@@ -7,7 +7,6 @@ import {
 } from "../validation/menu.validate";
 import { throwCustomError } from "../middleware/errorHandler";
 import { MenuItemRepo } from "../repository/menu.item.repository";
-import { any } from "joi";
 import { restaurantModel } from "../models/restaurant.model";
 import { menuItemModel } from "../models/menu.item.model";
 import { uploadModel } from "../models/upload.model";
@@ -47,13 +46,12 @@ export class MenuItemService {
     //check menu existence
     const isMenu = await MenuItemRepo.findMenuBySlug(slug);
     if (isMenu) throw throwCustomError("Menu-Item Exist", 409);
-
     //create new Menu
     const response = await MenuItemRepo.createMenu({
       ...data,
       slug,
       restaurantId: isRestaurant._id,
-      images: (data.images = path),
+      images: path,
     });
     if (!response) {
       throw throwCustomError("Menu not created", 500);
@@ -61,10 +59,12 @@ export class MenuItemService {
     if (path) {
       const menuExist = await menuItemModel.findOne({ slug }).lean().populate({
         path: "restaurantId",
-        model: "Restaurant",
-      });
+        //model: "Restaurant",
+      }).exec();
       console.log("menu exist", menuExist);
-      const domain = `http://localhost:8080/uploads/${path}`;
+
+      const domain = `http://localhost:3000/uploads/${path}`;
+
       const res = await MenuItemRepo.picture({
         restaurantId: isRestaurant._id,
         menuId: menuExist?._id,
