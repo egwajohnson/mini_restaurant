@@ -10,17 +10,33 @@ export class MenuController {
     const data = req.body;
     const path = req.file?.filename;
     if (!path) {
-    throw throwCustomError("Menu image is required", 400);
-  }
-  
+      throw throwCustomError("Menu image is required", 400);
+    }
+
     const response = await MenuItemService.createMenu(data, restaurantId, path);
     res.status(200).json({ success: true, payload: response });
   });
+  static editMenu = asyncWrapper(async (req: IRequest, res: Response) => {
+    const restaurantId = req.user.id;
+    const { menuId, update } = req.body;
+    const response = await MenuItemService.editMenu(
+      restaurantId,
+      menuId,
+      update
+    );
+    res.status(201).json({ statust: true, payload: response });
+  });
 
-  
+  static viewMenu = asyncWrapper(async (req: IRequest, res: Response) => {
+    const restaurantId = req.user.id;
+    const response = await MenuItemService.viewMenu(restaurantId);
+    res.status(201).json({ success: true, payload: response });
+  });
+
   static deleteMenu = asyncWrapper(async (req: IRequest, res: Response) => {
+    const restaurantId = req.user.id;
     const { slug } = req.body;
-    const response = await MenuItemService.deleteMenu(slug);
+    const response = await MenuItemService.deleteMenu(restaurantId, slug);
     res.status(201).json({ success: true, payload: response });
   });
 }
