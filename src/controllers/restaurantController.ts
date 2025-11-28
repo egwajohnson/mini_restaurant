@@ -39,4 +39,10 @@ export class RestaurantController {
       res.status(201).json({ success: true, payload: response });
     }
   );
+  static fetchRestaurants = asyncWrapper(
+    async (req: IRequest, res: Response) => {
+      const response = await RestaurantServices.fetchRestaurants();
+      res.status(201).json({ success: true, payload: response });
+    }
+  );
 }

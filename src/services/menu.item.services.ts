@@ -29,10 +29,10 @@ export class MenuItemService {
         model: "User",
       });
     if (!isRestaurant) throw throwCustomError("No Resaturant found", 400);
-    if (
-      isRestaurant?.adminStatus === "restricted" ||
-      isRestaurant?.adminStatus === "flagged"
-    ) {
+    if (isRestaurant?.adminStatus === "restricted") {
+      throw throwCustomError("Kindly complete your KYC.", 400);
+    }
+    if (isRestaurant?.adminStatus === "flagged") {
       throw throwCustomError(
         "You are not authorized to create a Menu. Kindly reach out to the admin",
         400
@@ -57,10 +57,14 @@ export class MenuItemService {
       throw throwCustomError("Menu not created", 500);
     }
     if (path) {
-      const menuExist = await menuItemModel.findOne({ slug }).lean().populate({
-        path: "restaurantId",
-        //model: "Restaurant",
-      }).exec();
+      const menuExist = await menuItemModel
+        .findOne({ slug })
+        .lean()
+        .populate({
+          path: "restaurantId",
+          //model: "Restaurant",
+        })
+        .exec();
       console.log("menu exist", menuExist);
 
       const domain = `http://localhost:3000/uploads/${path}`;

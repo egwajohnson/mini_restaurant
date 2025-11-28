@@ -133,4 +133,11 @@ export class RestaurantServices {
     );
     return `Your Restaurant is ${update?.status}`;
   };
+  static fetchRestaurants = async () => {
+    const response = await restaurantModel.find().populate({
+      path: "userId",
+      model: "User",
+    });
+    return response;
+  };
 }
