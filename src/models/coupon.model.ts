@@ -10,7 +10,7 @@ export const couponSchema = new Schema({
   usageLimit: { type: Number, require: false, min: 1 },
   usageCount: { type: Number, require: false, default: 0 },
   active: { type: Boolean, default: true },
-  appliedToMerchants: [{ type: Schema.Types.ObjectId, ref: "user" }],
+  appliedToCustomers: [{ type: Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

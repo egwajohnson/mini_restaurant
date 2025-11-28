@@ -148,5 +148,5 @@ router.post("/order/create", authMiddleware as any, cartControllers.createOrder 
 router.get("/order/get/:orderId", authMiddleware as any, cartControllers.getOrder as any);
 router.patch("/order/update/:cartId", authMiddleware as any, cartControllers.updateOrder as any);
 
-router.post("/coupon/create", CouponController.createCoupon as any);
+router.post("/coupon/create", adminAuthMiddleware as any,CouponController.createCoupon as any);
 export default router;
