@@ -15,6 +15,7 @@ import {
 import { upload } from "../config/multer.config";
 import { RestaurantController } from "../controllers/restaurantController";
 import { uploadMiddleware } from "../middleware/uploadMiddleware";
+import { CouponController } from "../controllers/coupon.controller";
 
 const router = express.Router();
 
@@ -146,4 +147,6 @@ router.get(
 router.post("/order/create", authMiddleware as any, cartControllers.createOrder as any);
 router.get("/order/get/:orderId", authMiddleware as any, cartControllers.getOrder as any);
 router.patch("/order/update/:cartId", authMiddleware as any, cartControllers.updateOrder as any);
+
+router.post("/coupon/create", CouponController.createCoupon as any);
 export default router;
