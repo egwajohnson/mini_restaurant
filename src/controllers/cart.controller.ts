@@ -6,7 +6,6 @@ import { Request, Response } from "express";
 export class cartControllers {
   static createcart = asyncWrapper(async (req: IRequest, res: Response) => {
     const ownerId = req.user.id;
-    //const data = req.body as Cart;
     const cart = await CartServices.createcart(ownerId);
     res.status(201).json(cart);
   });
@@ -44,13 +43,13 @@ export class cartControllers {
 
   static updateOrder = asyncWrapper(async (req: Request, res: Response) => {
     try {
-      const orderId = req.params.orderId;
-      const { menuitemId, quantity } = req.body;
-      console.log("Order ID:", orderId);
+      const cartId = req.params.cartId;
+      const { menuItemId, quantity } = req.body;
+      console.log("body:", req.body);
 
       const updatedOrder = await CartServices.updateOrder(
-        orderId as any,
-        menuitemId,
+        cartId as any,
+        menuItemId,
         quantity
       );
       console.log("Updated Order:", updatedOrder);

@@ -13,7 +13,7 @@ export class CartServices {
     if (!ownerId) {
       throw throwCustomError("Invalid cart data", 400);
     }
-    const existingCart = await CartRepositories.getcartByUserId(ownerId);
+    const existingCart = await CartRepositories.getcartByOwner(ownerId);
     if (existingCart) {
       throw throwCustomError("Cart already exists for this user", 409);
     }
@@ -48,8 +48,8 @@ export class CartServices {
         ownerId: ownerId,
         items: [
           {
-            productId: data.menuitemId,
-            productName: product.name,
+            menuItemId: data.menuitemId,
+            name: product.name,
             quantity: data.quantity,
             price: price,
           },
@@ -96,7 +96,7 @@ export class CartServices {
 
   // get cart by user
   static getCarts = async (ownerId: Types.ObjectId) => {
-    const cart = await CartRepositories.getcartByUserId(ownerId);
+    const cart = await CartRepositories.getcartByOwner(ownerId);
     if (!cart) throw throwCustomError("Cart not found", 404);
     return {
       success: true,
@@ -184,24 +184,23 @@ export class CartServices {
   };
 
   static async updateOrder(
-    orderId: Types.ObjectId,
-    menuitemId: Types.ObjectId,
+    cartId: Types.ObjectId,
+    menuItemId: Types.ObjectId,
     quantity: number
   ) {
-    if (!orderId) {
+    if (!cartId) {
       throw new Error("Order ID is required");
     }
-    if (!menuitemId) throw new Error("Menu Item ID is required");
+    if (!menuItemId) throw new Error("Menu Item ID is required");
     if (quantity == null || isNaN(quantity)) {
       throw new Error("Quantity must be a valid number");
     }
 
     const order = await CartRepositories.updateOrder(
-      orderId,
-      menuitemId,
+      cartId,
+      menuItemId,
       quantity
     );
-    await order?.save();
     return order;
   }
 }
