@@ -148,5 +148,8 @@ router.post("/order/create", authMiddleware as any, cartControllers.createOrder 
 router.get("/order/get/:orderId", authMiddleware as any, cartControllers.getOrder as any);
 router.patch("/order/update/:cartId", authMiddleware as any, cartControllers.updateOrder as any);
 
+//************************|| COUPON MANAGEMENT ||**************************//
 router.post("/coupon/create", adminAuthMiddleware as any,CouponController.createCoupon as any);
+router.post("/coupon/apply", authMiddleware as any, CouponController.applyCoupon as any);
+router.get("/coupon/list", adminAuthMiddleware as any, CouponController.listCoupons as any);
 export default router;

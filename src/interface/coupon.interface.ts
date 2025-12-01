@@ -3,8 +3,8 @@ import mongoose, { Document, Types } from "mongoose";
 export interface ICoupon {
   _id?: Types.ObjectId;          
   couponCode: string;                  
-  type: "percentage" | "fixed"; 
-  value: number;                 
+  discountType: "percentage" | "fixed"; 
+  discountValue: number;                 
   minOrderValue: number;         
   validFrom?: Date;              
   validTo?: Date;                

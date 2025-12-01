@@ -1,10 +1,14 @@
-import { now } from "mongoose";
+import { Types } from "mongoose";
 import { characters } from "../config/system.variable";
 import { ICoupon } from "../interface/coupon.interface";
 import { CouponRepository } from "../repository/coupon.repository";
 import { UserRepositories } from "../repository/user.repository";
+import { throwCustomError } from "../middleware/errorHandler";
 export class CouponServices {
   static createCoupon = async (couponData: ICoupon) => {
+    if (!couponData.discountType || !couponData.discountValue || !couponData.minOrderValue) {
+      throw throwCustomError("Coupon code is required", 400);
+    }
     // Generate a unique coupon code
     const couponCode = this.generateCouponCode(8);
     couponData.couponCode = couponCode;
@@ -26,9 +30,9 @@ export class CouponServices {
     }
     return result;
   };
-  
+
   static applyCoupon = async (
-    userId: string,
+    userId: Types.ObjectId | string,
     couponCode: string,
     orderAmount: number
   ) => {
