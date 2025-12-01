@@ -12,7 +12,7 @@ export class CouponRepository {
     userId: Types.ObjectId,
     couponCode: string,
     minOrderValue: number
-  ) => {
+  ) => {  
     const coupon = await couponModel.findById({
       userId,
       couponCode,
