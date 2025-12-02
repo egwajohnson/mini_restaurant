@@ -41,6 +41,11 @@ export class CartRepositories {
     return response;
   };
 
+  static  getCoupon = async (couponCode: string) => {
+    const coupon = await orderModel.findOne({ couponCode });
+    return coupon;
+  }
+
   static getOrder = async (orderId:Types.ObjectId) =>{
     const order = await orderModel.findById(orderId);
     return order;

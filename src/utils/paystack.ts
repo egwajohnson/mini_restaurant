@@ -1,12 +1,7 @@
 import axios from "axios";
 import { API_KEY } from "../config/system.variable";
+import { IInitializeTransaction } from "../interface/initialize.intrface";
 
-export interface IInitializeTransaction {
-  email: string;
-  amount: number;
-  callback_url: string;
-  metadata: object;
-}
 
 const API_URL = "https://api.paystack.co";
 

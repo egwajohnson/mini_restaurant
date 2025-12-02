@@ -22,5 +22,6 @@ export const couponSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const couponModel = mongoose.model("Coupon", couponSchema);
+export const couponModel = mongoose.model("Coupon", couponSchema);
 export default couponModel;
+

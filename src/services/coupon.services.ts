@@ -2,13 +2,22 @@ import { Types } from "mongoose";
 import { characters } from "../config/system.variable";
 import { ICoupon } from "../interface/coupon.interface";
 import { CouponRepository } from "../repository/coupon.repository";
+import { CartRepositories } from "../repository/cart.repository";
 import { UserRepositories } from "../repository/user.repository";
 import { throwCustomError } from "../middleware/errorHandler";
 export class CouponServices {
   static createCoupon = async (couponData: ICoupon) => {
-    if (!couponData.discountType || !couponData.discountValue || !couponData.minOrderValue) {
-      throw throwCustomError("Coupon code is required", 400);
+    if(!couponData.discountType){
+      throw throwCustomError("Discount type is required", 400);
     }
+    if(!couponData.discountValue){
+      throw throwCustomError("Discount value is required", 400);
+    }
+    if(!couponData.minOrderValue){
+      throw throwCustomError("Minimum order value is required", 400);
+    }
+
+
     // Generate a unique coupon code
     const couponCode = this.generateCouponCode(8);
     couponData.couponCode = couponCode;
@@ -92,12 +101,20 @@ export class CouponServices {
     discount = Math.min(discount, orderAmount);
 
     // Mark coupon as used by this user
-    coupon.appliedToCustomers?.push(userId as any);
+    coupon.appliedToCustomers = coupon.appliedToCustomers || [];
 
     // Increase usage count
     coupon.usageCount = (coupon.usageCount ?? 0) + 1;
     coupon.updatedAt = new Date();
     await coupon.save();
+    // Update user's total discount received
+    if (coupon) {
+      const user = await CartRepositories.getCoupon(couponCode);
+      if (user) {
+        user.totalAmount = (user.totalAmount || 0) - discount;
+        await user.save();
+      }
+    }
 
     return {
       success: true,

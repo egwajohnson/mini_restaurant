@@ -5,6 +5,7 @@ import { throwCustomError } from "../middleware/errorHandler";
 import { cartItem } from "../validation/menu.validate";
 import { Cart } from "../interface/menuItem.interface";
 import { orderModel } from "../models/order.model";
+import {PaystackService} from "../services/paystack.services";
 import { orderTemplate } from "../utils/order-template";
 import { userModel } from "../models/user.model";
 
@@ -147,17 +148,21 @@ export class CartServices {
       if (!order) {
         throw throwCustomError("Order creation failed", 500);
       }
-      // initiate payment here (mocked for this example)
-      const paymentRef = `PAY-${Date.now()}`;
-
-      order.paymentRef = paymentRef;
-      order.status = "pending";
-      await order.save();
+      // initiate payment
+      const payment = await PaystackService.initiatePayment(
+        order.totalPrice as number,
+         order._id.toString(), 
+         user.email as string
+        );
+      // order.paymentRef = payment.data.reference;
+      // order.status = "pending";
+      // await order.save();
 
       return {
         success: true,
-        message: "Order created successfully",
+        message: "Order created successfully, payment Link generated",
         data: order,
+        payment: payment,
       };
     } catch (error: any) {
       throw throwCustomError(

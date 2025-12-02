@@ -9,6 +9,9 @@ import { cartModel } from "../models/cart.model";
 import { orderTemplate } from "../utils/order-template";
 export class PaystackService {
   static async initiatePayment(amount: number, email: string, orderId: string) {
+     if (!email || !amount || !orderId) {
+        throw new Error("Email, amount, and orderId are required");
+      }
     try {
       const paymentData = {
         amount,
@@ -46,16 +49,12 @@ export class PaystackService {
   // paystack webhook
 
   static async webhook(payload: any) {
-    //process order
-    //send notification
 
     //check if trx is successfull
-
     if (payload.data.status === "success") {
       const orderId = payload.data.metadata.orderId;
 
       //find the order
-
       const order = await orderModel
         .findById(new Types.ObjectId(orderId))
         .populate({

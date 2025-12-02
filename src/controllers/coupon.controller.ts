@@ -19,7 +19,7 @@ export class CouponController {
       const { couponCode, orderAmount } = req.body;
       const userId = req.user.id; // assume user is authenticated
       const result = await CouponServices.applyCoupon(userId, couponCode, orderAmount);
-      res.status(200).json({success: true, message:"Coupon applied successfully", data: result});
+      res.status(200).json({success: true, message:"Coupon apply ", data: result});
     } catch (err: any) {
       console.error("Error applying coupon:", err);
       res.status(400).json({ success: false, message: err.message.detail || err.message } );

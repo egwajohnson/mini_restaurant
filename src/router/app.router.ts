@@ -1,7 +1,7 @@
 import express from "express";
 import { AdminAuthContoller } from "../controllers/adminAuthController";
 import { MenuController } from "../controllers/menu.controller";
-// import { AuthContoller } from "../controllers/auth.controller";
+import {PaystackController} from "../controllers/paystack.controller"
 import { AuthControllers } from "../controllers/auths.controller";
 import { cartControllers } from "../controllers/cart.controller";
 import {
@@ -152,4 +152,11 @@ router.patch("/order/update/:cartId", authMiddleware as any, cartControllers.upd
 router.post("/coupon/create", adminAuthMiddleware as any,CouponController.createCoupon as any);
 router.post("/coupon/apply", authMiddleware as any, CouponController.applyCoupon as any);
 router.get("/coupon/list", adminAuthMiddleware as any, CouponController.listCoupons as any);
+
+//************************|| PAYMENT MANAGEMENT ||**************************//
+router.post("/payment/initiate",authMiddleware as any, PaystackController.initiatePayment as any);
+router.get("/payment/verify/:reference",authMiddleware as any, PaystackController.verifyPayment as any);
+router.post("/payment/callback", PaystackController.handleCallback as any);
+router.post("/payment/webhook", PaystackController.webhook as any);
+
 export default router;
