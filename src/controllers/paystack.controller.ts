@@ -5,18 +5,27 @@ import { IRequest } from "../middleware/authMiddleware";
 export class PaystackController {
   static async initiatePayment(req: IRequest, res: Response) {
     try {
-      const email = req.body.email;
-      const amount = req.body.amount;
-      const orderId = req.body.orderId;
-      const response = await PaystackService.initiatePayment(amount, email, orderId);
-      res.status(200).json(response);
+      const { amount, email, orderId } = req.body;
+      const userId = req.user.id;
+      const response = await PaystackService.initiatePayment(
+        amount,
+        email,
+        orderId,
+        userId as any
+      );
+      console.log("PAYSTACK RESPONSE => ", response);
+      res.status(200).json({
+        success: true,
+        message: "Payment initiated successfully",
+        data: response,
+      });
     } catch (error: any) {
       res.status(400).send({ error: error.message });
     }
   }
   static async verifyPayment(req: Request, res: Response) {
     try {
-      const reference = req.params.reference;
+      const reference = req.params.reference as any;
       const response = await PaystackService.verifyPayment(reference);
       res.status(200).json(response);
     } catch (error: any) {

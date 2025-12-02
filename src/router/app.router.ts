@@ -159,4 +159,5 @@ router.get("/payment/verify/:reference",authMiddleware as any, PaystackControlle
 router.post("/payment/callback", PaystackController.handleCallback as any);
 router.post("/payment/webhook", PaystackController.webhook as any);
 
+
 export default router;

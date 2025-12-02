@@ -1,16 +1,20 @@
+import e from "express";
 import mongoose, { Schema } from "mongoose";
 
 const paystackSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "User", require: true },
   orderId: { type: Schema.Types.ObjectId, ref: "Order", require: true },
-  refund: { type: Number, require: true },
-  fees: { type: Number, require: true },
+  amount: { type: Number, require: true },
+  refund: { type: Number, default: 0 },
+  fees: { type: Number, default: 0 },
   status: {
     type: String,
     require: true,
     enum: ["pending", "paid", "failed", "in_progress"],
   },
   reference: { type: String },
+  accessCode: { type: String, required: true },
+  authorizationUrl: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

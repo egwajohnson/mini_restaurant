@@ -152,7 +152,8 @@ export class CartServices {
       const payment = await PaystackService.initiatePayment(
         order.totalPrice as number,
          order._id.toString(), 
-         user.email as string
+         user.email as string,
+         userId.toString()
         );
       // order.paymentRef = payment.data.reference;
       // order.status = "pending";

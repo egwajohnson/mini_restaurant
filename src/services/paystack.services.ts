@@ -8,9 +8,9 @@ import { sendMail } from "../utils/nodemailer";
 import { cartModel } from "../models/cart.model";
 import { orderTemplate } from "../utils/order-template";
 export class PaystackService {
-  static async initiatePayment(amount: number, email: string, orderId: string) {
-     if (!email || !amount || !orderId) {
-        throw new Error("Email, amount, and orderId are required");
+  static async initiatePayment(amount: number, email: string, orderId: string, userId: string) {
+     if (!email || !amount || !orderId || !userId) {
+        throw new Error("Email, amount, orderId, and userId are required");
       }
     try {
       const paymentData = {
@@ -21,11 +21,25 @@ export class PaystackService {
         amount: paymentData.amount * 100, // to kobo
         email: paymentData.email,
         callback_url: "https://google.com",
-        metadata: {
-          orderId,
-        },
+        metadata: {orderId},
       });
-      return paystackResponse;
+      const { reference, access_code, authorization_url } = paystackResponse.data;
+
+      if(paystackResponse.status !== true){
+         // save payment info to db
+         await PaymentRepository.CreatePayment({
+        userId,
+        orderId,
+        amount: paymentData.amount,
+        reference,
+        accessCode: access_code,
+        authorizationUrl: authorization_url,
+        status: "pending",
+      });
+      }
+
+      return paystackResponse.data;
+
     } catch (error: any) {
       if (error.response) {
         throw throwCustomError(error.response?.data.message, 400);

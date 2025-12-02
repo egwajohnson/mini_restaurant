@@ -3,7 +3,7 @@ import { Paystack } from "../utils/paystack";
 
 export class PaymentRepository {
   static async CreatePayment(paymentData: any) {
-    const payment = new payoutModel(paymentData);
-    return await payment.save();
+    const payment = await payoutModel.create(paymentData);
+    return payment;
   }
 }
