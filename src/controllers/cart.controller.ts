@@ -26,7 +26,9 @@ export class cartControllers {
   // create order
   static createOrder = asyncWrapper(async (req: IRequest, res: Response) => {
     const { cartId, street, city, state } = req.body;
+    console.log("Request body:", req.body);
     const userId = req.user.id;
+    console.log("User ID:", userId);
     const order = await CartServices.createorder(cartId, userId, {
       street,
       city,

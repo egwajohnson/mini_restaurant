@@ -8,50 +8,53 @@ import { sendMail } from "../utils/nodemailer";
 import { cartModel } from "../models/cart.model";
 import { orderTemplate } from "../utils/order-template";
 export class PaystackService {
-  static async initiatePayment(amount: number, email: string, orderId: string, userId: string) {
-     if (!email || !amount || !orderId || !userId) {
-        throw new Error("Email, amount, orderId, and userId are required");
-      }
+  static async initiatePayment(
+    amount: number,
+    email: string,
+    orderId: string,
+    userId: string
+  ) {
+    if (!email || !amount || !orderId || !userId) {
+      throw new Error("Email, amount, orderId, and userId are required");
+    }
     try {
-      const paymentData = {
-        amount,
-        email,
-      };
-      const paystackResponse = await Paystack.initializeTransaction({
-        amount: paymentData.amount * 100, // to kobo
-        email: paymentData.email,
-        callback_url: "https://google.com",
-        metadata: {orderId},
-      });
-      const { reference, access_code, authorization_url } = paystackResponse.data;
 
-      if(paystackResponse.status !== true){
-         // save payment info to db
-         await PaymentRepository.CreatePayment({
-        userId,
-        orderId,
-        amount: paymentData.amount,
-        reference,
-        accessCode: access_code,
-        authorizationUrl: authorization_url,
-        status: "pending",
+      const paystackResponse = await Paystack.initializeTransaction({
+        amount: amount * 100, // to kobo
+        email: email,
+        callback_url: "https://google.com",
+        metadata: { orderId },
       });
+      let payment;
+
+      if (paystackResponse.status === true) {
+         const { reference, access_code, authorization_url } =
+          paystackResponse.data;
+        // save payment info to db
+        const payment = await PaymentRepository.CreatePayment({
+          userId,
+          orderId,
+          amount: amount,
+          reference,
+          accessCode: access_code,
+          authorizationUrl: authorization_url,
+          status: "pending",
+        });
+        return payment;
       }
 
-      return paystackResponse.data;
-
+      return paystackResponse;
     } catch (error: any) {
       if (error.response) {
         throw throwCustomError(error.response?.data.message, 400);
       }
+      throw error;
     }
   }
 
   static async verifyPayment(reference: any) {
     try {
-      console.log("this is the ref", reference);
       const response = await Paystack.verifyPayment(reference);
-      console.log(response);
       return response;
     } catch (error: any) {
       if (error.response) {
@@ -63,7 +66,6 @@ export class PaystackService {
   // paystack webhook
 
   static async webhook(payload: any) {
-
     //check if trx is successfull
     if (payload.data.status === "success") {
       const orderId = payload.data.metadata.orderId;
@@ -90,7 +92,7 @@ export class PaystackService {
       sendMail(
         {
           email: user.email,
-          subject: "Login Confirmation",
+          subject: "Order Confirmation - " + order.orderId,
           emailInfo: {
             customer_name: user.firstName,
             order_number: order.orderId,
@@ -107,4 +109,17 @@ export class PaystackService {
       return { mesage: "success" };
     }
   }
-}
+
+  //update payment status
+  static async updatePaymentStatus(reference: string, status: string) {
+    try {
+      const payment = await PaymentRepository.updatePaymentStatus(reference, status);
+      if (!payment) {
+        throw new Error("Payment not found");
+      }
+      return payment;
+    } catch (error: any) {
+      throw error;
+    }
+  }
+  }

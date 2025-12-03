@@ -7,7 +7,6 @@ const API_URL = "https://api.paystack.co";
 
 export class Paystack {
   static async initializeTransaction(data: IInitializeTransaction) {
-    console.log(data);
     const response = await axios.post(
       `${API_URL}/transaction/initialize`,
       data,

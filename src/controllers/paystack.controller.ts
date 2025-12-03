@@ -13,7 +13,6 @@ export class PaystackController {
         orderId,
         userId as any
       );
-      console.log("PAYSTACK RESPONSE => ", response);
       res.status(200).json({
         success: true,
         message: "Payment initiated successfully",
@@ -35,7 +34,7 @@ export class PaystackController {
 
   static async handleCallback(req: Request, res: Response) {
     try {
-      const { reference } = req.body;
+      const reference  = req.query.reference as string;
       if (!reference) {
         throw new Error("Transaction reference not provided");
       }
@@ -45,6 +44,9 @@ export class PaystackController {
       } else {
         res.status(400).send({ message: "Payment verification failed" });
       }
+      
+       // Update your DB with payment status
+    await PaystackService.updatePaymentStatus(reference, response.data.status);
     } catch (error: any) {
       res.status(400).send({ error: error.message });
     }

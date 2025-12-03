@@ -1,9 +1,10 @@
 import e from "express";
+import { string } from "joi";
 import mongoose, { Schema } from "mongoose";
 
 const paystackSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "User", require: true },
-  orderId: { type: Schema.Types.ObjectId, ref: "Order", require: true },
+  orderId: { type: String, ref: "Order", require: true },
   amount: { type: Number, require: true },
   refund: { type: Number, default: 0 },
   fees: { type: Number, default: 0 },
