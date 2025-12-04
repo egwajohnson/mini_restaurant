@@ -38,7 +38,7 @@ export class PaystackService {
           reference,
           accessCode: access_code,
           authorizationUrl: authorization_url,
-          status: "pending",
+          status: "paid",
         });
         return payment;
       }

@@ -13,7 +13,7 @@ export const cartItemModel = mongoose.model("CartItem", cartItemSchema);
 
 const cartSchema = new Schema( 
   {
-    ownerId: { type: Schema.Types.ObjectId, ref: "user", require: true },
+    ownerId: { type: Schema.Types.ObjectId, ref: "User", require: true },
     items: [cartItemSchema], 
     couponCode: { type: String },
     totalPrice: { type: Number, require: true },
