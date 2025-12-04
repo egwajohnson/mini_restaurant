@@ -1,6 +1,10 @@
 import express from "express";
 import { AdminAuthContoller } from "../controllers/adminAuthController";
 import { MenuController } from "../controllers/menu.controller";
+<<<<<<< HEAD
+=======
+import {PaystackController} from "../controllers/paystack.controller"
+>>>>>>> b5e44b289c2c1e55325e32b971ac2c8029caa530
 import { AuthControllers } from "../controllers/auths.controller";
 import { cartControllers } from "../controllers/cart.controller";
 import {
@@ -14,6 +18,7 @@ import {
 import { upload } from "../config/multer.config";
 import { RestaurantController } from "../controllers/restaurantController";
 import { uploadMiddleware } from "../middleware/uploadMiddleware";
+import { CouponController } from "../controllers/coupon.controller";
 
 const router = express.Router();
 
@@ -147,19 +152,20 @@ router.get(
 );
 
 //create order
-router.post(
-  "/order/create",
-  authMiddleware as any,
-  cartControllers.createOrder as any
-);
-router.get(
-  "/order/get/:orderId",
-  authMiddleware as any,
-  cartControllers.getOrder as any
-);
-router.patch(
-  "/order/update/:orderId",
-  authMiddleware as any,
-  cartControllers.updateOrder as any
-);
+router.post("/order/create", authMiddleware as any, cartControllers.createOrder as any);
+router.get("/order/get/:orderId", authMiddleware as any, cartControllers.getOrder as any);
+router.patch("/order/update/:cartId", authMiddleware as any, cartControllers.updateOrder as any);
+
+//************************|| COUPON MANAGEMENT ||**************************//
+router.post("/coupon/create", adminAuthMiddleware as any,CouponController.createCoupon as any);
+router.post("/coupon/apply", authMiddleware as any, CouponController.applyCoupon as any);
+router.get("/coupon/list", adminAuthMiddleware as any, CouponController.listCoupons as any);
+
+//************************|| PAYMENT MANAGEMENT ||**************************//
+router.post("/payment/initiate",authMiddleware as any, PaystackController.initiatePayment as any);
+router.get("/payment/verify/:reference",authMiddleware as any, PaystackController.verifyPayment as any);
+router.post("/payment/callback", PaystackController.handleCallback as any);
+router.post("/payment/webhook", PaystackController.webhook as any);
+
+
 export default router;

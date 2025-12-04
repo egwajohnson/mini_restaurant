@@ -17,15 +17,34 @@ export class CartRepositories {
   };
 
   static createcart = async (ownerId: Types.ObjectId) => {
-    const response = await cartModel.create({ ownerId });
+    const response = await cartModel.create({ ownerId, items: [], totalPrice: 0 });
     return response;
   };
 
+  static addItem = async (cartId: string, item: any) => {
+    const response = await cartModel.findByIdAndUpdate(
+      cartId, item, { new: true }
+    );
+    return response;
+  };
+
+  static updatecart = async (cartId: string, data:Cart) => {
+    const response = await cartModel.findByIdAndUpdate(cartId, data, {
+      new: true,
+    });
+    return response;
+  }
+
   // get cart by user id
-  static getcartByUserId = async (ownerId: Types.ObjectId) => {
+  static getcartByOwner = async (ownerId: Types.ObjectId) => {
     const response = await cartModel.findOne({ ownerId });
     return response;
   };
+
+  static  getCoupon = async (couponCode: string) => {
+    const coupon = await orderModel.findOne({ couponCode });
+    return coupon;
+  }
 
   static getOrder = async (orderId:Types.ObjectId) =>{
     const order = await orderModel.findById(orderId);
@@ -33,12 +52,24 @@ export class CartRepositories {
 
   }
 
-   static async updateOrder(orderId: Types.ObjectId, menuitemId: Types.ObjectId, quantity: number ) {
-    const order = await orderModel.findOneAndUpdate(
-      { _id: orderId },
+   static async updateOrder(cartId: Types.ObjectId, menuItemId: Types.ObjectId, quantity: number ) {
+    const order = await cartModel.findOneAndUpdate(
+      { _id: cartId },
 
-       { $set: { quantity: quantity } },
-       { new: true, arrayFilters: [{"menuitemId": menuitemId}] }
+       { 
+        $set: {
+          "items.$[elem].quantity": quantity 
+        } 
+      },
+       { 
+        new: true, 
+        arrayFilters: 
+        [
+          {
+            "elem.menuItemId": menuItemId
+          }
+        ] 
+      }
     ).select('-__v');
     return order;
   }
