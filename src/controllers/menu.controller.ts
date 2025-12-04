@@ -8,7 +8,7 @@ export class MenuController {
   static createMenu = asyncWrapper(async (req: IRequest, res: Response) => {
     const restaurantId = req.user.id;
     const data = req.body;
-    const path = req.file?.filename;
+    const path = req.file?.originalname;
     if (!path) {
       throw throwCustomError("Menu image is required", 400);
     }
@@ -26,7 +26,17 @@ export class MenuController {
     );
     res.status(201).json({ statust: true, payload: response });
   });
-
+  static toggleMenuStatus = asyncWrapper(
+    async (req: IRequest, res: Response) => {
+      const restaurantId = req.user.id;
+      const { menuId } = req.body;
+      const response = await MenuItemService.toggleMenuStatus(
+        restaurantId,
+        menuId
+      );
+      res.status(201).json({ success: true, payload: response });
+    }
+  );
   static viewMenu = asyncWrapper(async (req: IRequest, res: Response) => {
     const restaurantId = req.user.id;
     const response = await MenuItemService.viewMenu(restaurantId);

@@ -1,7 +1,6 @@
 import express from "express";
 import { AdminAuthContoller } from "../controllers/adminAuthController";
 import { MenuController } from "../controllers/menu.controller";
-// import { AuthContoller } from "../controllers/auth.controller";
 import { AuthControllers } from "../controllers/auths.controller";
 import { cartControllers } from "../controllers/cart.controller";
 import {
@@ -76,8 +75,7 @@ router.patch(
 );
 router.patch(
   "/restauarant/flagged",
-  //adminAuthMiddleware as any,
-  //adminAuthMiddleware as any,
+  adminAuthMiddleware as any,
   RestaurantController.flagRestaurant
 );
 router.patch(
@@ -94,7 +92,6 @@ router.get(
 );
 
 // *****************************||MENU MANAGT... ||********************************//
-//Menu Items
 router.post(
   "/menu",
   authMiddleware as any,
@@ -109,9 +106,16 @@ router.patch(
   restaurantMiddleware as any,
   MenuController.editMenu
 );
+router.patch(
+  "/menu/toggle-status",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  MenuController.toggleMenuStatus
+);
 router.get(
   "/menu/view-menu",
   authMiddleware as any,
+  adminAuthMiddleware as any,
   restaurantMiddleware as any,
   MenuController.viewMenu
 );

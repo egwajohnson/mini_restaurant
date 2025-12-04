@@ -47,10 +47,10 @@ export const customerMiddleware = (
   next: NextFunction
 ) => {
   const user = req.user;
-  if (!user) return res.sendStatus(403);
+  // if (!user) return res.sendStatus(403);
   if (user.role !== "customer") {
     return res
-      .sendStatus(403)
+      .status(403)
       .json({ payload: "You are not authorized to access this resources" });
   }
   next();
@@ -63,11 +63,11 @@ export const restaurantMiddleware = (
 ) => {
   const user = req.user;
 
-  if (!user) return res.sendStatus(403);
+  // if (!user) return res.sendStatus(403);
   if (user.role !== "restaurant") {
     return res.status(403).json({
       success: false,
-      payload: "You are not authorized to access this resources",
+      payload: "You are not authorized rest to access this resources",
     });
   }
   next();

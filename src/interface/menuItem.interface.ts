@@ -7,7 +7,7 @@ export interface IMenuItem {
   price: number;
   discountPrice?: number;
   category: string;
-  isOpen?: boolean;
+  status?: string;
   images?: string;
   restaurantId?: Types.ObjectId;
   menuId?: Types.ObjectId;
