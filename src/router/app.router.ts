@@ -5,6 +5,7 @@ import { AuthControllers } from "../controllers/auths.controller";
 import { cartControllers } from "../controllers/cart.controller";
 import {
   authMiddleware,
+  customerMiddleware,
   restaurantMiddleware,
 } from "../middleware/authMiddleware";
 import {
@@ -16,6 +17,10 @@ import { RestaurantController } from "../controllers/restaurantController";
 import { uploadMiddleware } from "../middleware/uploadMiddleware";
 import { CouponController } from "../controllers/coupon.controller";
 import { PaystackController } from "../controllers/paystack.controller";
+import {
+  isAdminOrCustomer,
+  isAdminOrRestaurant,
+} from "../middleware/adminAndCustomer";
 
 const router = express.Router();
 
@@ -89,7 +94,7 @@ router.patch(
 
 router.get(
   "/restaurant/fetch-restaurant",
-  adminAuthMiddleware as any,
+  isAdminOrCustomer as any,
   RestaurantController.fetchRestaurants
 );
 
@@ -114,18 +119,19 @@ router.patch(
   restaurantMiddleware as any,
   MenuController.toggleMenuStatus
 );
+//restaurant individual menu
 router.get(
   "/menu/view-menu",
   authMiddleware as any,
-  adminAuthMiddleware as any,
   restaurantMiddleware as any,
   MenuController.viewMenu
 );
 
+router.get("/menus", isAdminOrCustomer as any, MenuController.menus);
+
 router.delete(
   "/menu/delete",
-  authMiddleware as any,
-  restaurantMiddleware as any,
+  isAdminOrRestaurant as any,
   MenuController.deleteMenu
 );
 

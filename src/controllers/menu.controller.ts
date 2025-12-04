@@ -43,6 +43,11 @@ export class MenuController {
     res.status(201).json({ success: true, payload: response });
   });
 
+  static menus = asyncWrapper(async (req: IRequest, res: Response) => {
+    const response = await MenuItemService.menus();
+    res.status(201).json({ success: true, payload: response });
+  });
+
   static deleteMenu = asyncWrapper(async (req: IRequest, res: Response) => {
     const restaurantId = req.user.id;
     const { slug } = req.body;

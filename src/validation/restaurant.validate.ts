@@ -4,7 +4,7 @@ export const kycValid = Joi.object({
   bvn: Joi.string().required().length(11),
 });
 export const restaurantValid = Joi.object({
-  restaurantName: Joi.string().optional().min(10),
+  restaurantName: Joi.string().required().min(10),
   address: Joi.object({
     label: Joi.string().trim().optional(),
     street: Joi.string().trim().optional(),
