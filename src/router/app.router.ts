@@ -17,10 +17,7 @@ import { RestaurantController } from "../controllers/restaurantController";
 import { uploadMiddleware } from "../middleware/uploadMiddleware";
 import { CouponController } from "../controllers/coupon.controller";
 import { PaystackController } from "../controllers/paystack.controller";
-import {
-  isAdminOrCustomer,
-  isAdminOrRestaurant,
-} from "../middleware/adminAndCustomer";
+import { isAdminOrCustomer } from "../middleware/specialMiddlware";
 
 const router = express.Router();
 
@@ -131,7 +128,9 @@ router.get("/menus", isAdminOrCustomer as any, MenuController.menus);
 
 router.delete(
   "/menu/delete",
-  isAdminOrRestaurant as any,
+  authMiddleware as any,
+  restaurantMiddleware as any,
+
   MenuController.deleteMenu
 );
 
