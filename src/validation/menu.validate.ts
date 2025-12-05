@@ -20,6 +20,6 @@ export const editValidate = Joi.object({
 });
 
 export const cartItem = Joi.object({
-  productId: Joi.string().required(),
+  menuitemId: Joi.string().required(),
   quantity: Joi.number().min(1).required(),
 });

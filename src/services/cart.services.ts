@@ -49,7 +49,7 @@ export class CartServices {
         ownerId: ownerId,
         items: [
           {
-            menuItemId: data.menuitemId,
+            productId: data.menuitemId,
             name: product.name,
             quantity: data.quantity,
             price: price,
@@ -65,7 +65,7 @@ export class CartServices {
       };
     } else {
       const idx = cart?.items.findIndex(
-        (item) => item.menuItemId?.toString() === data.menuitemId.toString()
+        (item) => item.menuitemId?.toString() === data.menuitemId.toString()
       );
 
       if (idx > -1) {
@@ -73,6 +73,7 @@ export class CartServices {
       } else {
         cart.items.push({
           productId: data.menuitemId,
+          name: product.name,
           quantity: data.quantity,
           price: price,
         });

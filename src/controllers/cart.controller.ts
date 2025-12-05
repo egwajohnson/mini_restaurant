@@ -12,6 +12,7 @@ export class cartControllers {
 
   static updateCart = asyncWrapper(async (req: IRequest, res: Response) => {
     const data = req.body as Cart;
+    console.log("Update Cart Data:", data);
     const ownerId = req.user.id;
     const cart = await CartServices.updateCart(data, ownerId);
     res.status(201).json(cart);
