@@ -1,11 +1,11 @@
 import express from "express";
 import { AdminAuthContoller } from "../controllers/adminAuthController";
 import { MenuController } from "../controllers/menu.controller";
-import {PaystackController} from "../controllers/paystack.controller"
 import { AuthControllers } from "../controllers/auths.controller";
 import { cartControllers } from "../controllers/cart.controller";
 import {
   authMiddleware,
+  customerMiddleware,
   restaurantMiddleware,
 } from "../middleware/authMiddleware";
 import {
@@ -16,6 +16,8 @@ import { upload } from "../config/multer.config";
 import { RestaurantController } from "../controllers/restaurantController";
 import { uploadMiddleware } from "../middleware/uploadMiddleware";
 import { CouponController } from "../controllers/coupon.controller";
+import { PaystackController } from "../controllers/paystack.controller";
+import { isAdminOrCustomer } from "../middleware/specialMiddlware";
 
 const router = express.Router();
 
@@ -77,8 +79,7 @@ router.patch(
 );
 router.patch(
   "/restauarant/flagged",
-  //adminAuthMiddleware as any,
-  //adminAuthMiddleware as any,
+  adminAuthMiddleware as any,
   RestaurantController.flagRestaurant
 );
 router.patch(
@@ -90,12 +91,11 @@ router.patch(
 
 router.get(
   "/restaurant/fetch-restaurant",
-  adminAuthMiddleware as any,
+  isAdminOrCustomer as any,
   RestaurantController.fetchRestaurants
 );
 
 // *****************************||MENU MANAGT... ||********************************//
-//Menu Items
 router.post(
   "/menu",
   authMiddleware as any,
@@ -110,6 +110,13 @@ router.patch(
   restaurantMiddleware as any,
   MenuController.editMenu
 );
+router.patch(
+  "/menu/toggle-status",
+  authMiddleware as any,
+  restaurantMiddleware as any,
+  MenuController.toggleMenuStatus
+);
+//restaurant individual menu
 router.get(
   "/menu/view-menu",
   authMiddleware as any,
@@ -117,10 +124,13 @@ router.get(
   MenuController.viewMenu
 );
 
+router.get("/menus", isAdminOrCustomer as any, MenuController.menus);
+
 router.delete(
   "/menu/delete",
   authMiddleware as any,
   restaurantMiddleware as any,
+
   MenuController.deleteMenu
 );
 
@@ -144,20 +154,51 @@ router.get(
 );
 
 //create order
-router.post("/order/create", authMiddleware as any, cartControllers.createOrder as any);
-router.get("/order/get/:orderId", authMiddleware as any, cartControllers.getOrder as any);
-router.patch("/order/update/:cartId", authMiddleware as any, cartControllers.updateOrder as any);
+router.post(
+  "/order/create",
+  authMiddleware as any,
+  cartControllers.createOrder as any
+);
+router.get(
+  "/order/get/:orderId",
+  authMiddleware as any,
+  cartControllers.getOrder as any
+);
+router.patch(
+  "/order/update/:cartId",
+  authMiddleware as any,
+  cartControllers.updateOrder as any
+);
 
 //************************|| COUPON MANAGEMENT ||**************************//
-router.post("/coupon/create", adminAuthMiddleware as any,CouponController.createCoupon as any);
-router.post("/coupon/apply", authMiddleware as any, CouponController.applyCoupon as any);
-router.get("/coupon/list", adminAuthMiddleware as any, CouponController.listCoupons as any);
+router.post(
+  "/coupon/create",
+  adminAuthMiddleware as any,
+  CouponController.createCoupon as any
+);
+router.post(
+  "/coupon/apply",
+  authMiddleware as any,
+  CouponController.applyCoupon as any
+);
+router.get(
+  "/coupon/list",
+  adminAuthMiddleware as any,
+  CouponController.listCoupons as any
+);
 
 //************************|| PAYMENT MANAGEMENT ||**************************//
-router.post("/payment/initiate",authMiddleware as any, PaystackController.initiatePayment as any);
-router.get("/payment/verify/:reference",authMiddleware as any, PaystackController.verifyPayment as any);
+router.post(
+  "/payment/initiate",
+  authMiddleware as any,
+  PaystackController.initiatePayment as any
+);
+router.get(
+  "/payment/verify/:reference",
+  authMiddleware as any,
+  PaystackController.verifyPayment as any
+);
 router.post("/payment/callback", PaystackController.handleCallback as any);
 router.post("/payment/webhook", PaystackController.webhook as any);
-
 
 export default router;

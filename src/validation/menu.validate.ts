@@ -6,10 +6,10 @@ export const menuItem = Joi.object({
   price: Joi.number().min(1).required(),
   discountedPrice: Joi.number().min(1).optional(),
   category: Joi.string().min(2).required(),
-  isOpen: Joi.boolean().optional(),
+  status: Joi.string().optional(),
 });
-export const slugValidate = Joi.object({
-  slug: Joi.string().required(),
+export const menuIdValidate = Joi.object({
+  menuId: Joi.string().required(),
 });
 export const editValidate = Joi.object({
   name: Joi.string().trim().min(2).max(100).optional(),

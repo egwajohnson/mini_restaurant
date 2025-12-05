@@ -50,7 +50,7 @@ export const customerMiddleware = (
   if (!user) return res.sendStatus(403);
   if (user.role !== "customer") {
     return res
-      .sendStatus(403)
+      .status(403)
       .json({ payload: "You are not authorized to access this resources" });
   }
   next();

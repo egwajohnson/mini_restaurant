@@ -1,4 +1,4 @@
-import { required } from "joi";
+import { required, string } from "joi";
 import mongoose, { Schema, Types } from "mongoose";
 
 const menuItemSchema = new Schema(
@@ -9,16 +9,16 @@ const menuItemSchema = new Schema(
     description: { type: String, require: true },
     price: { type: Number, require: true },
     discountedPrice: { type: Number, required: false },
-    quantity: { type: Number, required: true },
+    quantity: { type: Number, required: false },
     category: { type: String, require: true },
-    isOpen: { type: Boolean, default: true },
+    status: {
+      type: String,
+      enum: ["Available", "Unavailable"],
+      default: "Available",
+    },
     images: [{}],
   },
   { timestamps: true }
 );
 
 export const menuItemModel = mongoose.model("Menu_Item", menuItemSchema);
-
-
-
-

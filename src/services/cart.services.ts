@@ -38,8 +38,9 @@ export class CartServices {
     // Calculate total price
     const price = product.discountedPrice ?? product.price;
 
-    if (data.quantity > product.quantity)
-      throw throwCustomError("Out of stock", 400);
+    // TO-DO - Check if the menu is Available  or Unavailable
+    // if (data.quantity > product.quantity)
+    //   throw throwCustomError("Out of stock", 400);
 
     //get user cart
     const cart = await cartModel.findOne({ ownerId: ownerId });
