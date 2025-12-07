@@ -5,9 +5,9 @@ import { menuItemModel } from "../models/menu.item.model";
 import { orderModel } from "../models/order.model";
 
 export class CartRepositories {
-  static findById = async (id: Types.ObjectId) => {
-    const res = menuItemModel.findById(id).lean();
-    if (!res) return null;
+  static findById = async (id: Types.ObjectId | string) => {
+     console.log("Received menuItemId:", id);
+    const res = await menuItemModel.findById(id).lean();
     return res;
   };
   static findByQuantity = async (menuitemId: Types.ObjectId) => {

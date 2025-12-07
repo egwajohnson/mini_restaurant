@@ -15,6 +15,7 @@ export class cartControllers {
     console.log("Update Cart Data:", data);
     const ownerId = req.user.id;
     const cart = await CartServices.updateCart(data, ownerId);
+    console.log
     res.status(201).json(cart);
   });
 

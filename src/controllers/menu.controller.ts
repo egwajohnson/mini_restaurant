@@ -12,7 +12,6 @@ export class MenuController {
     if (!path) {
       throw throwCustomError("Menu image is required", 400);
     }
-
     const response = await MenuItemService.createMenu(data, restaurantId, path);
     res.status(200).json({ success: true, payload: response });
   });

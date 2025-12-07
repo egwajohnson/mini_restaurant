@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { Types } from "mongoose";
 
 export const menuItem = Joi.object({
   name: Joi.string().trim().min(2).max(100).required(),
@@ -20,6 +21,13 @@ export const editValidate = Joi.object({
 });
 
 export const cartItem = Joi.object({
-  menuitemId: Joi.string().required(),
+  _id: Joi.string()
+    .custom((value, helpers) => {
+      if (!Types.ObjectId.isValid(value)) {
+        return helpers.error("any.invalid");
+      }
+      return value;
+    })
+    .required(),
   quantity: Joi.number().min(1).required(),
 });

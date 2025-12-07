@@ -27,30 +27,30 @@ export class CartServices {
     const { error } = cartItem.validate(data);
     if (error) throwCustomError(`Validation error: ${error.message}`, 400);
 
-    if (!Types.ObjectId.isValid(data.menuitemId))
-      throw throwCustomError("InvaliId Product ID", 422);
+    // if (!Types.ObjectId.isValid(data.menuItemId))
+    //   throw throwCustomError("Invalid Product ID", 422);
     //get product by id
-    const product = await CartRepositories.findById(
-      new Types.ObjectId(data.menuitemId)
-    );
-    if (!product) throw throwCustomError("Product not found", 404);
+    const product = await CartRepositories.findById(data.id);
+    if (!product) throw throwCustomError("menu-items not found", 404);
 
     // Calculate total price
     const price = product.discountedPrice ?? product.price;
 
     // TO-DO - Check if the menu is Available  or Unavailable
+    
     // if (data.quantity > product.quantity)
     //   throw throwCustomError("Out of stock", 400);
 
     //get user cart
-    const cart = await cartModel.findOne({ ownerId: ownerId });
+    let cart = await cartModel.findOne({ ownerId });
+    
     if (!cart) {
       //create the cart
       const res = await cartModel.create({
         ownerId: ownerId,
         items: [
           {
-            productId: data.menuitemId,
+            productId: data.id,
             name: product.name,
             quantity: data.quantity,
             price: price,
@@ -66,14 +66,14 @@ export class CartServices {
       };
     } else {
       const idx = cart?.items.findIndex(
-        (item) => item.menuitemId?.toString() === data.menuitemId.toString()
+        (item) => item.menuitemId?.toString() === data.id.toString()
       );
 
       if (idx > -1) {
         cart.items[idx].quantity = data.quantity;
       } else {
         cart.items.push({
-          productId: data.menuitemId,
+          productId: data.id,
           name: product.name,
           quantity: data.quantity,
           price: price,
