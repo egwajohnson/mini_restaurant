@@ -46,14 +46,14 @@ export class CartServices {
         path: "restaurantId",
         model: "Restaurant",
       });
-    console.log(menu);
+
     if (!menu) throw throwCustomError("menu-items not found", 404);
 
     // Calculate total price
     const price = menu.discountedPrice ?? menu.price;
 
     //Check menu status
-    if (menu.status !== "Unavailable") {
+    if (menu.status === "Unavailable") {
       throw throwCustomError("Menu is Unavailable", 422);
     }
 
