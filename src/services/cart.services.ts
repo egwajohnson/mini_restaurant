@@ -51,6 +51,10 @@ export class CartServices {
 
     // Calculate total price
     const price = menu.discountedPrice ?? menu.price;
+    if (price == null) {
+      // catches null or undefined
+      throw throwCustomError("Menu price not available", 500);
+    }
 
     //Check menu status
     if (menu.status === "Unavailable") {
@@ -73,8 +77,7 @@ export class CartServices {
             price: price,
           },
         ],
-        //totalPrice: price * data.quantity,
-        totalprice: (price as any) * data.quantity,
+        totalPrice: price * data.quantity,
       });
       return {
         success: true,
@@ -82,7 +85,7 @@ export class CartServices {
         data: res,
       };
     } else {
-      const idx = cart?.items.findIndex(
+      const idx = cart.items.findIndex(
         (item) => item.menuId?.toString() === data.menuId.toString()
       );
 
@@ -94,16 +97,16 @@ export class CartServices {
           restaurantId: isMenuId?.restaurantId,
           name: menu.name,
           quantity: data.quantity,
-          price: price,
+          price,
         });
       }
 
-      const sum = cart.items.reduce(
+      cart.totalPrice = cart.items.reduce(
         (acc, item) => acc + item.price * item.quantity,
         0
       );
 
-      cart.totalPrice = sum;
+      // cart.totalPrice = sum;
 
       await cart.save();
 
