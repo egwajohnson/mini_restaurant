@@ -135,30 +135,37 @@ export class MenuItemService {
     restaurantId: Types.ObjectId,
     menuId: string
   ) => {
-    const restaurant = await restaurantModel.findOne(restaurantId).populate({
-      path: "userId",
-      model: "User",
-    });
+    const restaurant = await restaurantModel
+      .findOne({ userId: restaurantId })
+      .populate({
+        path: "userId",
+        model: "User",
+      });
 
     const menu = await menuItemModel.findOne(new Types.ObjectId(menuId));
     if (!menuId) throw throwCustomError(`No Menu with ID ${menuId} found`, 422);
-    if (!restaurant?._id.equals((menu?.restaurantId as any)._id)) {
+    if (!restaurant?._id.equals(menu?.restaurantId as any)) {
       throw throwCustomError("Invalid", 422);
     }
-    const response = await menuItemModel.findOneAndUpdate({ _id: menuId }, [
-      {
-        $set: {
-          status: {
-            $cond: [
-              { $eq: ["$status", "Available"] },
-              "Unavailable",
-              "Available",
-            ],
+    const response = await menuItemModel.findOneAndUpdate(
+      { _id: menuId },
+      [
+        {
+          $set: {
+            status: {
+              $cond: [
+                { $eq: ["$status", "Unavailable"] },
+                "Available",
+                "Unavailable",
+              ],
+            },
           },
         },
-      },
-    ]);
+      ],
+      { new: true }
+    );
     if (!response) throw throwCustomError("unable to Update menu Status", 422);
+
     return `Menu set to ${response.status}`;
   };
   static viewMenu = async (restaurantId: Types.ObjectId) => {
@@ -168,7 +175,9 @@ export class MenuItemService {
         path: "userId",
         model: "User",
       });
-    const menu = await menuItemModel.find({ restaurantId: restaurant?._id });
+    const menu = await menuItemModel
+      .find({ restaurantId: restaurant?._id })
+      .select("-__v");
     if (!menu) throw throwCustomError("No Menu Available", 400);
     return menu;
   };

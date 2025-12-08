@@ -5,9 +5,11 @@ import { throwCustomError } from "../middleware/errorHandler";
 import { cartItem } from "../validation/menu.validate";
 import { Cart } from "../interface/menuItem.interface";
 import { orderModel } from "../models/order.model";
-import {PaystackService} from "../services/paystack.services";
+import { PaystackService } from "../services/paystack.services";
 import { orderTemplate } from "../utils/order-template";
 import { userModel } from "../models/user.model";
+import { menuItemModel } from "../models/menu.item.model";
+import { restaurantModel } from "../models/restaurant.model";
 
 export class CartServices {
   static createcart = async (ownerId: Types.ObjectId) => {
@@ -23,35 +25,50 @@ export class CartServices {
   };
 
   // update cart
-  static updateCart = async (data: Cart, ownerId: Types.ObjectId) => {
+  static updateCart = async (
+    // restaurantId: Types.ObjectId,
+    data: Cart,
+    ownerId: Types.ObjectId
+  ) => {
     const { error } = cartItem.validate(data);
     if (error) throwCustomError(`Validation error: ${error.message}`, 400);
 
     // if (!Types.ObjectId.isValid(data.menuItemId))
     //   throw throwCustomError("Invalid Product ID", 422);
     //get product by id
-    const product = await CartRepositories.findById(data.id);
-    if (!product) throw throwCustomError("menu-items not found", 404);
+
+    const isMenuId = await menuItemModel.findById(data.menuId);
+
+    console.log("ismenu", isMenuId);
+    const menu = await menuItemModel
+      .findOne({ slug: isMenuId?.slug })
+      .populate({
+        path: "restaurantId",
+        model: "Restaurant",
+      });
+    console.log(menu);
+    if (!menu) throw throwCustomError("menu-items not found", 404);
 
     // Calculate total price
-    const price = product.discountedPrice ?? product.price;
+    const price = menu.discountedPrice ?? menu.price;
 
-    // TO-DO - Check if the menu is Available  or Unavailable
-    
-    // if (data.quantity > product.quantity)
-    //   throw throwCustomError("Out of stock", 400);
+    //Check menu status
+    if (menu.status !== "Unavailable") {
+      throw throwCustomError("Menu is Unavailable", 422);
+    }
 
     //get user cart
     let cart = await cartModel.findOne({ ownerId });
-    
+
     if (!cart) {
       //create the cart
       const res = await cartModel.create({
         ownerId: ownerId,
         items: [
           {
-            productId: data.id,
-            name: product.name,
+            menuId: data.menuId,
+            restaurantId: isMenuId?.restaurantId,
+            name: menu.name,
             quantity: data.quantity,
             price: price,
           },
@@ -66,15 +83,16 @@ export class CartServices {
       };
     } else {
       const idx = cart?.items.findIndex(
-        (item) => item.menuitemId?.toString() === data.id.toString()
+        (item) => item.menuId?.toString() === data.menuId.toString()
       );
 
       if (idx > -1) {
         cart.items[idx].quantity = data.quantity;
       } else {
         cart.items.push({
-          productId: data.id,
-          name: product.name,
+          menuId: data.menuId,
+          restaurantId: isMenuId?.restaurantId,
+          name: menu.name,
           quantity: data.quantity,
           price: price,
         });
@@ -153,10 +171,10 @@ export class CartServices {
       // initiate payment
       const payment = await PaystackService.initiatePayment(
         order.totalPrice as number,
-         order._id.toString(), 
-         user.email as string,
-         userId.toString()
-        );
+        order._id.toString(),
+        user.email as string,
+        userId.toString()
+      );
       // order.paymentRef = payment.data.reference;
       // order.status = "pending";
       // await order.save();

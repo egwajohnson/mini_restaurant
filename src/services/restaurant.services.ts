@@ -138,6 +138,13 @@ export class RestaurantServices {
       path: "userId",
       model: "User",
     });
-    return response;
+    return response.map((item) => {
+      return {
+        id: item.id,
+        restaurantName: item.restaurantName,
+        status: item.status,
+        adminStatus: item.adminStatus,
+      };
+    });
   };
 }
