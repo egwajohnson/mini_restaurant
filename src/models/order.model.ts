@@ -4,7 +4,7 @@ export const orderSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: "User", require: true },
   cartId: { type: Schema.Types.ObjectId, ref: "Cart", require: true },
   subTotal: { type: Number, require: true }, //total unit price
-  discount: { type: Number, require: false },
+  discount: { type: Number, default:0 },
   orderId: { type: String, require: true },
   deliveryFee: { type: Number },
   totalAmount: { type: Number, require: true },

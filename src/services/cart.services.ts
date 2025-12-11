@@ -178,9 +178,6 @@ export class CartServices {
         user.email as string,
         userId.toString()
       );
-      // order.paymentRef = payment.data.reference;
-      // order.status = "pending";
-      // await order.save();
 
       return {
         success: true,

@@ -91,7 +91,7 @@ export class UserServices {
       {
         email: user.email,
         subject: "OTP VERIFICATION",
-        emailInfo: {
+        emailInfo: { 
           otp: otp.toString(),
           name: `${user.lastName} ${user.firstName}`,
         },

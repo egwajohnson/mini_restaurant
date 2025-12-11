@@ -3,6 +3,7 @@ import { cartModel } from "../models/cart.model";
 import { Cart } from "../interface/menuItem.interface";
 import { menuItemModel } from "../models/menu.item.model";
 import { orderModel } from "../models/order.model";
+import {couponModel} from "../models/coupon.model";
 
 export class CartRepositories {
   static findById = async (id: Types.ObjectId | string) => {
@@ -15,6 +16,11 @@ export class CartRepositories {
     if (!res) return null;
     return res;
   };
+
+  static getDiscount = async(id:Types.ObjectId) =>{
+     const coupon = await couponModel.findById(id);
+     return coupon;
+  }
 
   static createcart = async (ownerId: Types.ObjectId) => {
     const response = await cartModel.create({ ownerId, items: [], totalPrice: 0 });

@@ -186,6 +186,7 @@ router.get(
   adminAuthMiddleware as any,
   CouponController.listCoupons as any
 );
+router.patch("/checkoutOrder",authMiddleware as any,CouponController.checkoutOrder as any)
 
 //************************|| PAYMENT MANAGEMENT ||**************************//
 router.post(

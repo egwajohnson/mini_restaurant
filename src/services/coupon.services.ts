@@ -1,22 +1,23 @@
 import { Types } from "mongoose";
 import { characters } from "../config/system.variable";
 import { ICoupon } from "../interface/coupon.interface";
+import { orderModel } from "../models/order.model";
 import { CouponRepository } from "../repository/coupon.repository";
 import { CartRepositories } from "../repository/cart.repository";
 import { UserRepositories } from "../repository/user.repository";
+import {couponModel} from "../models/coupon.model"
 import { throwCustomError } from "../middleware/errorHandler";
 export class CouponServices {
   static createCoupon = async (couponData: ICoupon) => {
-    if(!couponData.discountType){
+    if (!couponData.discountType) {
       throw throwCustomError("Discount type is required", 400);
     }
-    if(!couponData.discountValue){
+    if (!couponData.discountValue) {
       throw throwCustomError("Discount value is required", 400);
     }
-    if(!couponData.minOrderValue){
+    if (!couponData.minOrderValue) {
       throw throwCustomError("Minimum order value is required", 400);
     }
-
 
     // Generate a unique coupon code
     const couponCode = this.generateCouponCode(8);
@@ -76,6 +77,7 @@ export class CouponServices {
       throw new Error("Coupon already used by this user");
     }
 
+
     const usageLimit = coupon.usageLimit ?? 1;
     const usageCount = coupon.usageCount ?? 0;
     // Check usage limit
@@ -120,7 +122,64 @@ export class CouponServices {
       success: true,
       discount,
       newTotal: orderAmount - discount,
+      couponCode,
       message: "Coupon applied successfully",
     };
   };
+
+  //checkoutOrder
+ static async checkoutOrder(
+  orderId: Types.ObjectId | string,
+  userId: Types.ObjectId | string,
+  couponCode: string
+) {
+  if (!orderId) {
+    throw throwCustomError("orderId is required", 400);
+  }
+  if (!userId) {
+    throw throwCustomError("userId is required", 400);
+  }
+  if (!couponCode) {
+    throw throwCustomError("couponCode is required", 400);
+  }
+
+  const order = await orderModel.findById(orderId);
+  if (!order) throw new Error("Order not found");
+
+  const coupon = await CouponRepository.findByCode(couponCode);
+  console.log("coupon codes",coupon )
+  if (!coupon) throw new Error("Invalid coupon code");
+
+  //compare
+  // if(!couponCode == !coupon){
+  //    throw throwCustomError("coupon code error", 400)
+  // }
+
+  const orderAmount = order.totalAmount ?? 0;
+
+ 
+  const result = await CouponServices.applyCoupon(
+    userId,
+    couponCode,
+    orderAmount
+  );
+
+  if (result.newTotal == null) throw new Error("newTotal is missing");
+
+  // Save coupon and discount to order
+  order.couponCode = couponCode;     
+  order.discount = result.discount;  
+  order.totalAmount = result.newTotal; 
+
+  order.updatedAt = new Date();
+  await order.save();
+
+  // Return updated order
+  return {
+    success: true,
+    message: "Order updated with coupon",
+    data: order,
+  };
+}
+
 }
