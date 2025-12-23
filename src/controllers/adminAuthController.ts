@@ -12,12 +12,11 @@ export class AdminAuthContoller {
   });
 
   static login = asyncWrapper(async (req: IARequest, res: Response) => {
-    const { email, username, password } = req.body;
+    const { data, password } = req.body;
     const ipAddress = req.ip as string;
     const userAgent = req.headers["user-agent"] as string;
     const response = await AdminService.adminLogin(
-      email,
-      username,
+      data,
       password,
       ipAddress,
       userAgent

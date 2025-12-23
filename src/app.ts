@@ -5,7 +5,7 @@ import { PORT } from "./config/system.variable";
 import router from "./router/app.router";
 import { handleCustomError } from "./middleware/errorHandler";
 import { mongoConnection } from "./config/db.connection";
-import {limiter} from "./utils/rate-limits"
+import { limiter } from "./utils/rate-limits";
 import path from "path";
 
 const app = express();

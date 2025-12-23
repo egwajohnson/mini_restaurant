@@ -184,6 +184,7 @@ export class MenuItemService {
 
   static menus = async () => {
     const response = await menuItemModel.find();
+
     if (!response) throw throwCustomError("unable to perform operation", 422);
     return response;
   };

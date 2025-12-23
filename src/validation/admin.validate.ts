@@ -20,8 +20,7 @@ export const adminValidate = Joi.object({
 });
 export const adminLoginvalidate = Joi.object({
   email: Joi.string().optional().email().trim(),
-  username: Joi.string().optional(),
-  password: Joi.string().required().trim().min(8),
+  userName: Joi.string().optional(),
 });
 export const upgradeAdmin = Joi.object({
   email: Joi.string().email().trim().required(),

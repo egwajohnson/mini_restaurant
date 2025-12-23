@@ -47,29 +47,29 @@ export class AdminService {
   };
 
   static adminLogin = async (
-    email: string,
-    username: string,
+    data: {
+      email: string;
+      userName: string;
+    },
     password: string,
     ipAddress: string,
     userAgent: string
   ) => {
-    const { error } = adminLoginvalidate.validate({
-      email,
-      username,
-      password,
-    });
+    if (!data) throw throwCustomError("Input a data", 422);
+    const { error } = adminLoginvalidate.validate(data);
     if (error) throw throwCustomError(error.message, 422);
-    //data to lowercase
-    email = email.toLowerCase();
-    // if (username) {
-    //   // check username
-    //   const userName = await adminModel.findOne({ username: username });
-    //   if (!userName) throw throwCustomError("Invalid Account", 422);
-    // }
-    // check email validity
-    const admin = await AdminRepo.findAdminByEmail(email);
-    if (!admin) throw throwCustomError("Invalid account", 500);
-
+    let admin;
+    if (data.email) {
+      // check email validity
+      data.email = data.email.toLowerCase();
+      admin = await adminModel.findOne({ email: data.email });
+      if (!admin) throw throwCustomError("Invalid account", 500);
+    } else {
+      //   // check username
+      data.userName = data.userName.toLowerCase();
+      admin = await adminModel.findOne({ username: data.userName });
+      if (!admin) throw throwCustomError("Invalid Username", 422);
+    }
     //compare password
     const hashedPassword = await bcrypt.compare(
       password,
@@ -194,7 +194,7 @@ export class AdminService {
 
     //compare passwords
 
-    if(data.password !== data.confirm){
+    if (data.password !== data.confirm) {
       throw throwCustomError("Password do not match", 400);
     }
 
