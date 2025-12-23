@@ -21,7 +21,7 @@ export class RestaurantServices {
     });
     if (isRestaurant?.adminStatus === "flagged") {
       throw throwCustomError(
-        "Your account has been flagged. kindly reach out to the admin",
+        "Your account is flagged. kindly reach out to the admin",
         400
       );
     }
@@ -36,7 +36,7 @@ export class RestaurantServices {
         item.lastName.toLowerCase() === user.lastName?.toLowerCase()
       );
     });
-    console.log(isUser);
+    // console.log(isUser);
     if (!isUser) throw throwCustomError("Invalid Information", 422);
     //check bvn match
     const isBvn = kycRecords.find((result) => {
@@ -59,6 +59,7 @@ export class RestaurantServices {
       path: "userId",
       model: "User",
     });
+    // encrypt BVN TODO
     const verify = await restaurantModel.findByIdAndUpdate(
       restaurant?.id,
       {
@@ -70,6 +71,7 @@ export class RestaurantServices {
     if (!verify) throw throwCustomError("Unable to verify Restaurant", 400);
     return `Your ${res.role} has been verified`;
   };
+
   static updateRestaurant = async (userId: Types.ObjectId, update: any) => {
     const { error } = restaurantValid.validate(update);
     if (error) throw throwCustomError(error.message, 422);
