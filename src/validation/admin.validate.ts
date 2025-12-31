@@ -3,7 +3,7 @@ import Joi from "joi";
 export const adminValidate = Joi.object({
   firstName: Joi.string().trim().max(20).required(),
   lastName: Joi.string().trim().max(20).required(),
-  username: Joi.string().trim().max(20).required(),
+  userName: Joi.string().trim().max(20).required(),
   email: Joi.string().email().trim().required(),
   password: Joi.string()
     .trim()
@@ -33,7 +33,7 @@ export const emailValidate = Joi.object({
 export const profileValidate = Joi.object({
   firstName: Joi.string().trim().max(20).optional(),
   lastName: Joi.string().trim().max(20).optional(),
-  username: Joi.string().min(3).optional(),
+  userName: Joi.string().min(3).optional(),
 });
 export const pwdValidate = Joi.object({
   password: Joi.string()

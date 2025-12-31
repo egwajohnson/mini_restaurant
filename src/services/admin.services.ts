@@ -20,6 +20,10 @@ import crypto from "crypto";
 import { Types } from "mongoose";
 import { adminOtpModel } from "../models/otp.model";
 
+import { adminTemplate } from "../utils/adminRegTemplate";
+import { mailAdmin } from "../utils/admin-nodemailer";
+import { adminLoginTemp } from "../utils/adminLoginTemp";
+
 export class AdminService {
   static createAdmin = async (admin: IAdminReg) => {
     const { error } = adminValidate.validate(admin);
@@ -43,6 +47,17 @@ export class AdminService {
     if (!response) {
       throw throwCustomError("unable to create Admin account", 500);
     }
+    //sendMail
+    mailAdmin(
+      {
+        email: admin.email,
+        subject: "Admin Registration Successful",
+        emailInfo: {
+          name: `${admin.firstName} ${admin.lastName}`,
+        },
+      },
+      adminTemplate
+    );
     return "Admin account created";
   };
 
@@ -67,7 +82,7 @@ export class AdminService {
     } else {
       //   // check username
       data.userName = data.userName.toLowerCase();
-      admin = await adminModel.findOne({ username: data.userName });
+      admin = await adminModel.findOne({ userName: data.userName });
       if (!admin) throw throwCustomError("Invalid Username", 422);
     }
     //compare password
@@ -89,6 +104,19 @@ export class AdminService {
     }
 
     //send mail TODO
+    mailAdmin(
+      {
+        email: admin.email as string,
+        subject: "Security Alert",
+        emailInfo: {
+          name: `${admin.userName}`,
+          ipAddress: ipAddress,
+          userAgent: userAgent,
+        },
+      },
+      adminLoginTemp
+    );
+
     return {
       message: "Login successful",
       authKey: jwtKey,

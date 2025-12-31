@@ -4,6 +4,7 @@ import { kycValid, restaurantValid } from "../validation/restaurant.validate";
 import { kycRecords } from "../utils/kyc-records";
 import { restaurantModel } from "../models/restaurant.model";
 import { userModel } from "../models/user.model";
+import { myPassword } from "../config/system.variable";
 
 export class RestaurantServices {
   static kyc = async (userId: Types.ObjectId, bvn: string) => {
@@ -27,8 +28,8 @@ export class RestaurantServices {
     }
 
     //check if user is already verified
-    if (user.is_kyc_verified)
-      throw throwCustomError("Kyc already verified", 400);
+    // if (user.is_kyc_verified)
+    //   throw throwCustomError("Kyc already verified", 400);
     //call external api
     const isUser = kycRecords.find((item) => {
       return (
@@ -60,15 +61,22 @@ export class RestaurantServices {
       model: "User",
     });
     // encrypt BVN TODO
+    const password = myPassword;
+    const data = bvn;
+
+    const { iv, encrypted } = await Secure.encrypt(data, password);
     const verify = await restaurantModel.findByIdAndUpdate(
       restaurant?.id,
       {
-        bvn: bvn,
-        adminStatus: "verified",
+        $set: {
+          bvn: encrypted,
+          iv,
+          adminStatus: "verified",
+        },
       },
       { new: true }
     );
-    if (!verify) throw throwCustomError("Unable to verify Restaurant", 400);
+    if (!verify) throwCustomError("Unable to verify Restaurant", 400);
     return `Your ${res.role} has been verified`;
   };
 
@@ -147,6 +155,29 @@ export class RestaurantServices {
         status: item.status,
         adminStatus: item.adminStatus,
       };
+    });
+  };
+}
+
+export class Secure {
+  static encrypt = async (
+    data: string,
+    password: string
+  ): Promise<{ iv: string; encrypted: string }> => {
+    const { scrypt, randomFill, createCipheriv } = await import("node:crypto");
+    const algorithm = "aes-256-cbc";
+
+    return new Promise((resolve, reject) => {
+      scrypt(password, "salt", 32, (err, key) => {
+        if (err) reject(err);
+        randomFill(new Uint8Array(16), (err, iv) => {
+          if (err) reject(err);
+          const cipher = createCipheriv(algorithm, key, iv);
+          let encrypted = cipher.update(data, "utf8", "hex");
+          encrypted += cipher.final("hex");
+          resolve({ iv: Buffer.from(iv).toString("hex"), encrypted });
+        });
+      });
     });
   };
 }
