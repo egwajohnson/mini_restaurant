@@ -28,8 +28,8 @@ export class RestaurantServices {
     }
 
     //check if user is already verified
-    // if (user.is_kyc_verified)
-    //   throw throwCustomError("Kyc already verified", 400);
+    if (user.is_kyc_verified)
+      throw throwCustomError("Kyc already verified", 400);
     //call external api
     const isUser = kycRecords.find((item) => {
       return (
@@ -60,7 +60,7 @@ export class RestaurantServices {
       path: "userId",
       model: "User",
     });
-    // encrypt BVN TODO
+    // encrypt BVN
     const password = myPassword;
     const data = bvn;
 
@@ -83,9 +83,10 @@ export class RestaurantServices {
   static updateRestaurant = async (userId: Types.ObjectId, update: any) => {
     const { error } = restaurantValid.validate(update);
     if (error) throw throwCustomError(error.message, 422);
-    //check if user is verified
+    //check if user exist
     const user = await userModel.findById(userId);
     if (!user) throw throwCustomError("No record found", 500);
+    //check if user is verified
     if (!user.is_kyc_verified) throw throwCustomError("Complete your KYC", 422);
     //restauran model
     const isRestaurant = await restaurantModel.findOne({ userId }).populate({
