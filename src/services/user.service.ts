@@ -25,7 +25,7 @@ import crypto from "crypto";
 import mongoose, { Types } from "mongoose";
 
 export class UserServices {
-  static preRister = async (user: IPreRegister) => {
+  static preRegister = async (user: IPreRegister) => {
     if (!user) {
       throw new Error("Invalid user data");
     }
@@ -91,7 +91,7 @@ export class UserServices {
       {
         email: user.email,
         subject: "OTP VERIFICATION",
-        emailInfo: { 
+        emailInfo: {
           otp: otp.toString(),
           name: `${user.lastName} ${user.firstName}`,
         },
