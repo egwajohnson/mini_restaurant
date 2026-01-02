@@ -1,4 +1,4 @@
-import { couponModel } from "../models/coupon.model";
+import couponModel  from "../models/coupon.model";
 import { ICoupon } from "../interface/coupon.interface";
 import { Types } from "mongoose";
 

@@ -76,7 +76,7 @@ export class UserRepositories {
       }
 
     static otpVerify = async (email: string, otp: string) => {
-    const response = await otpModel.findOneAndDelete({ email, otp });
+    const response = await otpModel.findOneAndUpdate({ email, otp });
     if (!response) return null;
     return response;
   };

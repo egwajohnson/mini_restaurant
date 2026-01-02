@@ -5,7 +5,7 @@ import { orderModel } from "../models/order.model";
 import { CouponRepository } from "../repository/coupon.repository";
 import { CartRepositories } from "../repository/cart.repository";
 import { UserRepositories } from "../repository/user.repository";
-import {couponModel} from "../models/coupon.model"
+import couponModel from "../models/coupon.model"
 import { throwCustomError } from "../middleware/errorHandler";
 export class CouponServices {
   static createCoupon = async (couponData: ICoupon) => {

@@ -125,10 +125,10 @@ export class UserServices {
     );
     if (!isValid) throw throwCustomError("Invalid Otp", 422);
     // verify otp
-    // const isOtpValid = await UserRepositories.otpVerify(user.email, user.otp);
-    // if (!isOtpValid) {
-    //   throw throwCustomError("Invalid OTP", 400);
-    // }
+    const isOtpValid = await UserRepositories.otpVerify(user.email, user.otp);
+    if (!isOtpValid) {
+      throw throwCustomError("Invalid OTP", 400);
+    }
 
     const verifyUser = await UserRepositories.getUserById(UserExist._id);
     if (!verifyUser) {

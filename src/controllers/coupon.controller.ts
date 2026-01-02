@@ -1,5 +1,5 @@
 import { IRequest } from "../middleware/authMiddleware";
-import {couponModel} from "../models/coupon.model";
+import couponModel from "../models/coupon.model";
 import { CouponServices } from "../services/coupon.services";
 import { Request, Response } from "express";
 export class CouponController {
