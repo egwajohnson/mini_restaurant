@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { App_pass } from "../config/system.variable";
 let configOptions = {
   host: "1.2.3.4",
   port: 465,
@@ -14,7 +15,7 @@ export const sendMail = async (
   cb: Function
 ) => {
   try {
-    const sender = "callistus455@gmail.com";
+    const sender = "egwajohnson.a@gmail.com";
     const transporter = nodemailer.createTransport({
       host: sender,
       //   port: 587,
@@ -22,7 +23,7 @@ export const sendMail = async (
       secure: true,
       auth: {
         user: sender,
-        pass: "nkyn vzqa hxln iych",
+        pass: App_pass,
       },
     });
 

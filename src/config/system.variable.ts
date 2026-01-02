@@ -10,3 +10,4 @@ export const characters = process.env.CHARACTERS as string;
 export const API_KEY = process.env.API_KEY as string;
 export const myPassword = process.env.MY_PASSWORD as string;
 export const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY as string;
+export const App_pass=process.env.App_pass as string;
