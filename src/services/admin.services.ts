@@ -20,6 +20,10 @@ import crypto from "crypto";
 import { Types } from "mongoose";
 import { adminOtpModel } from "../models/otp.model";
 
+import { adminTemplate } from "../utils/adminRegTemplate";
+import { mailAdmin } from "../utils/admin-nodemailer";
+import { adminLoginTemp } from "../utils/adminLoginTemp";
+
 export class AdminService {
   static createAdmin = async (admin: IAdminReg) => {
     const { error } = adminValidate.validate(admin);
@@ -43,33 +47,44 @@ export class AdminService {
     if (!response) {
       throw throwCustomError("unable to create Admin account", 500);
     }
+    //sendMail
+    mailAdmin(
+      {
+        email: admin.email,
+        subject: "Admin Registration Successful",
+        emailInfo: {
+          name: `${admin.firstName} ${admin.lastName}`,
+        },
+      },
+      adminTemplate
+    );
     return "Admin account created";
   };
 
   static adminLogin = async (
-    email: string,
-    username: string,
+    data: {
+      email: string;
+      userName: string;
+    },
     password: string,
     ipAddress: string,
     userAgent: string
   ) => {
-    const { error } = adminLoginvalidate.validate({
-      email,
-      username,
-      password,
-    });
+    if (!data) throw throwCustomError("Input a data", 422);
+    const { error } = adminLoginvalidate.validate(data);
     if (error) throw throwCustomError(error.message, 422);
-    //data to lowercase
-    email = email.toLowerCase();
-    // if (username) {
-    //   // check username
-    //   const userName = await adminModel.findOne({ username: username });
-    //   if (!userName) throw throwCustomError("Invalid Account", 422);
-    // }
-    // check email validity
-    const admin = await AdminRepo.findAdminByEmail(email);
-    if (!admin) throw throwCustomError("Invalid account", 500);
-
+    let admin;
+    if (data.email) {
+      // check email validity
+      data.email = data.email.toLowerCase();
+      admin = await adminModel.findOne({ email: data.email });
+      if (!admin) throw throwCustomError("Invalid account", 500);
+    } else {
+      //   // check username
+      data.userName = data.userName.toLowerCase();
+      admin = await adminModel.findOne({ userName: data.userName });
+      if (!admin) throw throwCustomError("Invalid Username", 422);
+    }
     //compare password
     const hashedPassword = await bcrypt.compare(
       password,
@@ -89,6 +104,19 @@ export class AdminService {
     }
 
     //send mail TODO
+    mailAdmin(
+      {
+        email: admin.email as string,
+        subject: "Security Alert",
+        emailInfo: {
+          name: `${admin.userName}`,
+          ipAddress: ipAddress,
+          userAgent: userAgent,
+        },
+      },
+      adminLoginTemp
+    );
+
     return {
       message: "Login successful",
       authKey: jwtKey,
@@ -194,7 +222,7 @@ export class AdminService {
 
     //compare passwords
 
-    if(data.password !== data.confirm){
+    if (data.password !== data.confirm) {
       throw throwCustomError("Password do not match", 400);
     }
 

@@ -9,7 +9,7 @@ export const adminSchema = new Schema({
   otp: { type: String },
   lastName: { type: String, require: true },
   email: { type: String, require: true, unique: true },
-  username: { type: String, require: true, unique: true },
+  userName: { type: String, require: true, unique: true },
   password: { type: String, require: true },
   role: {
     type: String,

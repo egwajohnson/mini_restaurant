@@ -4,6 +4,7 @@ import { kycValid, restaurantValid } from "../validation/restaurant.validate";
 import { kycRecords } from "../utils/kyc-records";
 import { restaurantModel } from "../models/restaurant.model";
 import { userModel } from "../models/user.model";
+import { myPassword } from "../config/system.variable";
 
 export class RestaurantServices {
   static kyc = async (userId: Types.ObjectId, bvn: string) => {
@@ -21,7 +22,7 @@ export class RestaurantServices {
     });
     if (isRestaurant?.adminStatus === "flagged") {
       throw throwCustomError(
-        "Your account has been flagged. kindly reach out to the admin",
+        "Your account is flagged. kindly reach out to the admin",
         400
       );
     }
@@ -36,7 +37,7 @@ export class RestaurantServices {
         item.lastName.toLowerCase() === user.lastName?.toLowerCase()
       );
     });
-    console.log(isUser);
+    // console.log(isUser);
     if (!isUser) throw throwCustomError("Invalid Information", 422);
     //check bvn match
     const isBvn = kycRecords.find((result) => {
@@ -59,23 +60,33 @@ export class RestaurantServices {
       path: "userId",
       model: "User",
     });
+    // encrypt BVN
+    const password = myPassword;
+    const data = bvn;
+
+    const { iv, encrypted } = await Secure.encrypt(data, password);
     const verify = await restaurantModel.findByIdAndUpdate(
       restaurant?.id,
       {
-        bvn: bvn,
-        adminStatus: "verified",
+        $set: {
+          bvn: encrypted,
+          iv,
+          adminStatus: "verified",
+        },
       },
       { new: true }
     );
-    if (!verify) throw throwCustomError("Unable to verify Restaurant", 400);
+    if (!verify) throwCustomError("Unable to verify Restaurant", 400);
     return `Your ${res.role} has been verified`;
   };
+
   static updateRestaurant = async (userId: Types.ObjectId, update: any) => {
     const { error } = restaurantValid.validate(update);
     if (error) throw throwCustomError(error.message, 422);
-    //check if user is verified
+    //check if user exist
     const user = await userModel.findById(userId);
     if (!user) throw throwCustomError("No record found", 500);
+    //check if user is verified
     if (!user.is_kyc_verified) throw throwCustomError("Complete your KYC", 422);
     //restauran model
     const isRestaurant = await restaurantModel.findOne({ userId }).populate({
@@ -145,6 +156,29 @@ export class RestaurantServices {
         status: item.status,
         adminStatus: item.adminStatus,
       };
+    });
+  };
+}
+
+export class Secure {
+  static encrypt = async (
+    data: string,
+    password: string
+  ): Promise<{ iv: string; encrypted: string }> => {
+    const { scrypt, randomFill, createCipheriv } = await import("node:crypto");
+    const algorithm = "aes-256-cbc";
+
+    return new Promise((resolve, reject) => {
+      scrypt(password, "salt", 32, (err, key) => {
+        if (err) reject(err);
+        randomFill(new Uint8Array(16), (err, iv) => {
+          if (err) reject(err);
+          const cipher = createCipheriv(algorithm, key, iv);
+          let encrypted = cipher.update(data, "utf8", "hex");
+          encrypted += cipher.final("hex");
+          resolve({ iv: Buffer.from(iv).toString("hex"), encrypted });
+        });
+      });
     });
   };
 }

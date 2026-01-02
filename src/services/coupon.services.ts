@@ -77,7 +77,6 @@ export class CouponServices {
       throw new Error("Coupon already used by this user");
     }
 
-
     const usageLimit = coupon.usageLimit ?? 1;
     const usageCount = coupon.usageCount ?? 0;
     // Check usage limit
@@ -128,58 +127,56 @@ export class CouponServices {
   };
 
   //checkoutOrder
- static async checkoutOrder(
-  orderId: Types.ObjectId | string,
-  userId: Types.ObjectId | string,
-  couponCode: string
-) {
-  if (!orderId) {
-    throw throwCustomError("orderId is required", 400);
+  static async checkoutOrder(
+    orderId: Types.ObjectId | string,
+    userId: Types.ObjectId | string,
+    couponCode: string
+  ) {
+    if (!orderId) {
+      throw throwCustomError("orderId is required", 400);
+    }
+    if (!userId) {
+      throw throwCustomError("userId is required", 400);
+    }
+    if (!couponCode) {
+      throw throwCustomError("couponCode is required", 400);
+    }
+
+    const order = await orderModel.findById(orderId);
+    if (!order) throw new Error("Order not found");
+
+    const coupon = await CouponRepository.findByCode(couponCode);
+    console.log("coupon codes", coupon);
+    if (!coupon) throw new Error("Invalid coupon code");
+
+    //compare
+    // if(!couponCode == !coupon){
+    //    throw throwCustomError("coupon code error", 400)
+    // }
+
+    const orderAmount = order.totalAmount ?? 0;
+
+    const result = await CouponServices.applyCoupon(
+      userId,
+      couponCode,
+      orderAmount
+    );
+
+    if (result.newTotal == null) throw new Error("newTotal is missing");
+
+    // Save coupon and discount to order
+    order.couponCode = couponCode;
+    order.discount = result.discount;
+    order.totalAmount = result.newTotal;
+
+    order.updatedAt = new Date();
+    await order.save();
+
+    // Return updated order
+    return {
+      success: true,
+      message: "Order updated with coupon",
+      data: order,
+    };
   }
-  if (!userId) {
-    throw throwCustomError("userId is required", 400);
-  }
-  if (!couponCode) {
-    throw throwCustomError("couponCode is required", 400);
-  }
-
-  const order = await orderModel.findById(orderId);
-  if (!order) throw new Error("Order not found");
-
-  const coupon = await CouponRepository.findByCode(couponCode);
-  console.log("coupon codes",coupon )
-  if (!coupon) throw new Error("Invalid coupon code");
-
-  //compare
-  // if(!couponCode == !coupon){
-  //    throw throwCustomError("coupon code error", 400)
-  // }
-
-  const orderAmount = order.totalAmount ?? 0;
-
- 
-  const result = await CouponServices.applyCoupon(
-    userId,
-    couponCode,
-    orderAmount
-  );
-
-  if (result.newTotal == null) throw new Error("newTotal is missing");
-
-  // Save coupon and discount to order
-  order.couponCode = couponCode;     
-  order.discount = result.discount;  
-  order.totalAmount = result.newTotal; 
-
-  order.updatedAt = new Date();
-  await order.save();
-
-  // Return updated order
-  return {
-    success: true,
-    message: "Order updated with coupon",
-    data: order,
-  };
-}
-
 }
