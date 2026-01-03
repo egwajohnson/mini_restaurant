@@ -7,7 +7,7 @@ export class AuthControllers {
   static preRegister = async (req: IRequest, res: Response) => {
     try {
       const user = req.body;
-      const response = await UserServices.preRister(user);
+      const response = await UserServices.preRegister(user);
       res.status(201).json({
         success: true,
         payload: response,

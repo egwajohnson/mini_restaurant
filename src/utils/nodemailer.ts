@@ -15,7 +15,7 @@ export const sendMail = async (
   cb: Function
 ) => {
   try {
-    const sender = "egwajohnson.a@gmail.com";
+    const sender = "thetechbrocode@gmail.com";
     const transporter = nodemailer.createTransport({
       host: sender,
       //   port: 587,
@@ -23,7 +23,7 @@ export const sendMail = async (
       secure: true,
       auth: {
         user: sender,
-        pass: App_pass,
+        pass: "mkqe gpgq zlcy wbkt",
       },
     });
 
