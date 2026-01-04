@@ -14,7 +14,13 @@ import {
 
 import { adminModel } from "../models/admin.model";
 import Jwt from "jsonwebtoken";
-import { admin_jwt_secret, jwt_exp } from "../config/system.variable";
+import {
+  admin_email,
+  admin_jwt_secret,
+  admin_password,
+  admin_username,
+  jwt_exp,
+} from "../config/system.variable";
 import crypto from "crypto";
 
 import { Types } from "mongoose";
@@ -25,6 +31,28 @@ import { mailAdmin } from "../utils/admin-nodemailer";
 import { adminLoginTemp } from "../utils/adminLoginTemp";
 
 export class AdminService {
+  static superAdmin = async () => {
+    const existingAdmin = await adminModel.findOne({ email: admin_email });
+    if (existingAdmin) {
+      console.log("email already in use");
+    }
+    const hashedPassword = await bcrypt.hash(admin_password, 5);
+    if (!existingAdmin) {
+      const newAdmin = await adminModel.create({
+        email: admin_email,
+        userName: admin_username,
+        password: hashedPassword,
+        is_verified: true,
+        isAuthorized: true,
+        role: "superAdmin",
+      });
+      await newAdmin.save();
+      console.log("Admin created");
+    } else {
+      console.log("Admin already existed");
+    }
+  };
+
   static createAdmin = async (admin: IAdminReg) => {
     const { error } = adminValidate.validate(admin);
     if (error) {

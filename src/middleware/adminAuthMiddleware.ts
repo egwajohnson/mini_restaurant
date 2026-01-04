@@ -8,7 +8,7 @@ export interface IARequest extends Request {
   admin: {
     id: Types.ObjectId;
     email: string;
-    username: string;
+    userName: string;
     is_verified?: boolean;
     isAuthorized?: boolean;
     role: string;
@@ -33,7 +33,7 @@ export const adminAuthMiddleware = (
     req.admin = {
       email: admin.email as string,
       id: admin._id,
-      username: admin.username as string,
+      userName: admin.userName as string,
       is_verified: admin.is_verified,
       isAuthorized: admin.isAuthorized,
       role: admin.role as string,

@@ -2,6 +2,9 @@ import dotenv from "dotenv";
 dotenv.config({ quiet: true });
 
 export const PORT = process.env.PORT;
+export const admin_email = process.env.ADMIN_EMAIL as string;
+export const admin_password = process.env.ADMIN_PASSWORD as string;
+export const admin_username = process.env.ADMIN_USERNAME as string;
 export const dburl = process.env.DB_CONNECTION_URL as string;
 export const jwt_secret = process.env.JWT_SECRET as string;
 export const jwt_exp = process.env.JWT_EXP as string;
@@ -10,4 +13,4 @@ export const characters = process.env.CHARACTERS as string;
 export const API_KEY = process.env.API_KEY as string;
 export const myPassword = process.env.MY_PASSWORD as string;
 export const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY as string;
-export const App_pass=process.env.App_pass as string;
+export const App_pass = process.env.App_pass as string;

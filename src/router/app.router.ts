@@ -23,16 +23,23 @@ const router = express.Router();
 
 //************************|| ADMIN MANAGEMENT ||**************************//
 //Admin Auth
-router.post("/auth/admin/register", AdminAuthContoller.createAdmin);
+router.post(
+  "/auth/admin/register",
+  adminAuthMiddleware as any,
+  superAdminMiddleware as any,
+  AdminAuthContoller.createAdmin
+);
 router.post("/auth/admin/login", AdminAuthContoller.login);
 router.patch(
   "/auth/admin/upgrade",
   adminAuthMiddleware as any,
+  superAdminMiddleware as any,
   AdminAuthContoller.upgradeAdmin
 );
 router.patch(
   "/auth/admin/profile",
   adminAuthMiddleware as any,
+  superAdminMiddleware as any,
   AdminAuthContoller.profile
 );
 
@@ -186,7 +193,11 @@ router.get(
   adminAuthMiddleware as any,
   CouponController.listCoupons as any
 );
-router.patch("/checkoutOrder",authMiddleware as any,CouponController.checkoutOrder as any)
+router.patch(
+  "/checkoutOrder",
+  authMiddleware as any,
+  CouponController.checkoutOrder as any
+);
 
 //************************|| PAYMENT MANAGEMENT ||**************************//
 router.post(
